@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "151240183995",
+    "firebase_url": "https://bhaithamen.firebaseio.com",
+    "project_id": "bhaithamen",
+    "storage_bucket": "bhaithamen.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:151240183995:android:93af0ebcf1452106ed199e",
+        "android_client_info": {
+          "package_name": "com.bhaithamen.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "151240183995-3uuin99010j43u8r69nlf1t2jup4kfuo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBT4UfetNuRFDDkOzcmC2bONIzEfMPvOgc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "151240183995-3uuin99010j43u8r69nlf1t2jup4kfuo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
