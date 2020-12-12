@@ -79,15 +79,15 @@ class _MultiImagePickerScreenState extends State<MultiImagePickerScreen> {
     return new MaterialApp(
       home: new Scaffold(
         appBar: new AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text(''),
         ),
         body: Column(
           children: <Widget>[
-            Center(child: Text('Error: $_error')),
-            RaisedButton(
-              child: Text("Pick images"),
-              onPressed: loadAssets,
-            ),
+            // Center(child: Text('Error: $_error')),
+            // RaisedButton(
+            //   child: Text("Pick images"),
+            //   onPressed: loadAssets,
+            // ),
             Expanded(
               child: buildGridView(),
             )

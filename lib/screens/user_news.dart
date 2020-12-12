@@ -1,3 +1,5 @@
+import 'dart:core';
+
 import 'package:bhaithamen/data/news_feed.dart';
 import 'package:bhaithamen/data/user_news_feed.dart';
 import 'package:bhaithamen/screens/user_article.dart';
@@ -15,6 +17,7 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geodesy/geodesy.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:image_gallery_grid_fb/image_gallery_grid_fb.dart';
 
 class UserNewsPage extends StatefulWidget {
   @override
@@ -485,17 +488,27 @@ class _UserNewsPageState extends State<UserNewsPage> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         SizedBox(height: 10),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            feeddoc.images.length == 0
-                                                ? Container()
+                                        feeddoc.images.length == 0
+                                            ? Container()
+                                            : feeddoc.images.length > 1
+                                                ? GalleryImageGridFb(
+                                                    imageUrls:
+                                                        List<String>.from(
+                                                            feeddoc.images),
+                                                    onTap: () => Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            UserArticle(
+                                                                feeddoc),
+                                                      ),
+                                                    ),
+                                                  )
                                                 : Center(
                                                     child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              12.0),
+                                                      padding: const EdgeInsets
+                                                              .fromLTRB(
+                                                          12, 40, 12, 10),
                                                       child: CachedNetworkImage(
                                                         height: 150,
                                                         imageUrl:
@@ -517,26 +530,19 @@ class _UserNewsPageState extends State<UserNewsPage> {
                                                       ),
                                                     ),
                                                   ),
-                                            Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Linkify(
-                                                    onOpen: _onOpen,
-                                                    text: feeddoc.article
-                                                                .length >
-                                                            100
-                                                        ? feeddoc.article
-                                                                .substring(
-                                                                    0, 100) +
-                                                            '...'
-                                                        : feeddoc.article,
-                                                    style: myStyle(
-                                                        16,
-                                                        Colors.black,
-                                                        FontWeight.w400))),
-                                            SizedBox(height: 10),
-                                          ],
-                                        ),
+                                        Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                20, 0, 20, 10),
+                                            child: Linkify(
+                                                onOpen: _onOpen,
+                                                text: feeddoc.article.length >
+                                                        100
+                                                    ? feeddoc.article
+                                                            .substring(0, 100) +
+                                                        '...'
+                                                    : feeddoc.article,
+                                                style: myStyle(16, Colors.black,
+                                                    FontWeight.w400))),
                                         SizedBox(height: 10),
                                       ],
                                     ))),
