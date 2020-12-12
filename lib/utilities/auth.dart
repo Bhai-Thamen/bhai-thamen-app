@@ -198,6 +198,7 @@ class AuthService {
           show: doc.data()['show'],
           title: doc.data()['title'],
           reports: doc.data()['reports'],
+          location: doc.data()['location'],
           comments: doc.data()['comments'],
           images: doc.data()['images']);
     }).toList();

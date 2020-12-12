@@ -40,6 +40,7 @@ class _NewsWrapperState extends State<NewsWrapper> {
   String userPhone = '';
   String userEmail = '';
   String profilePic = '';
+  bool isUploading = false;
   var uuid = Uuid();
 
   initState() {
@@ -94,39 +95,48 @@ class _NewsWrapperState extends State<NewsWrapper> {
 
   _postComment() async {
     print('post ');
-    List<String> imageUrls = List<String>();
-    GeoPoint reportLocation;
+    if (myNews.text.replaceAll(' ', '') != '') {
+      List<String> imageUrls = List<String>();
+      GeoPoint reportLocation;
 
-    for (var i = 0; i < multiPickedImages.length; i++) {
-      dynamic url = await saveImage(multiPickedImages[i]);
-      imageUrls.add(url);
+      for (var i = 0; i < multiPickedImages.length; i++) {
+        dynamic url = await saveImage(multiPickedImages[i]);
+        imageUrls.add(url);
+      }
+      reportLocation = await getUserLocation();
+      //print(imageUrls);
+      //print(reportLocation);
+
+      int unixDate = getDate().toUtc().millisecondsSinceEpoch;
+
+      final userNewsFeedDoc = UserNewsFeed(
+              time: DateTime.now(),
+              unixTime: unixDate,
+              userName: userName,
+              uid: uid,
+              userPhone: userPhone,
+              location: reportLocation,
+              article: myNews.text,
+              likes: [],
+              reports: [],
+              comments: [],
+              shares: 0,
+              images: imageUrls,
+              show: true,
+              profilePic: profilePic)
+          .toMap();
+
+      userNewsCollection.doc().set(userNewsFeedDoc).then((doc) {
+        print('POST DONE');
+        setState(() {
+          isUploading = false;
+          imageUrls = [];
+          multiPickedImages = [];
+          myNews.text = '';
+          Navigator.pop(context);
+        });
+      });
     }
-    reportLocation = await getUserLocation();
-    //print(imageUrls);
-    //print(reportLocation);
-
-    int unixDate = getDate().toUtc().millisecondsSinceEpoch;
-
-    final userNewsFeedDoc = UserNewsFeed(
-            time: DateTime.now(),
-            unixTime: unixDate,
-            userName: userName,
-            uid: uid,
-            userPhone: userPhone,
-            location: reportLocation,
-            article: myNews.text,
-            likes: [],
-            reports: [],
-            comments: [],
-            shares: 0,
-            images: imageUrls,
-            show: true,
-            profilePic: profilePic)
-        .toMap();
-
-    userNewsCollection.doc().set(userNewsFeedDoc).then((doc) {
-      print('ALL DONE');
-    });
   }
 
   int newsPageIndex = 0;
@@ -159,89 +169,114 @@ class _NewsWrapperState extends State<NewsWrapper> {
         builder: (context) {
           return StatefulBuilder(builder: (BuildContext context,
               StateSetter setModalState /*You can rename this!*/) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12.0, vertical: 12.0),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('Share something...', style: myStyle(21)),
-                            Spacer(),
-                            FlatButton(
-                              color: Colors.blue,
-                              child: Text('img'),
-                              onPressed: () {
-                                Navigator.pop(context);
-                                navigateSettings();
-                              },
-                            ),
-                          ])),
-                  SizedBox(
-                    height: 4.0,
-                  ),
-                  multiPickedImages.length > 0
-                      ? SizedBox(
-                          height: 150,
-                          child: Column(
-                            children: [
-                              Expanded(
-                                  child: GridView.count(
-                                crossAxisCount: 3,
-                                children: List.generate(
-                                    multiPickedImages.length, (index) {
-                                  Asset asset = multiPickedImages[index];
-                                  return GestureDetector(
-                                    onLongPress: () {
-                                      setModalState(() {
-                                        multiPickedImages.removeAt(index);
-                                      });
+            return !isUploading
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 12.0),
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('Share something...',
+                                      style: myStyle(21)),
+                                  Spacer(),
+                                  FlatButton(
+                                    color: Colors.blue,
+                                    child: Text('img'),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      navigateSettings();
                                     },
-                                    child: AssetThumb(
-                                      asset: asset,
-                                      width: 100,
-                                      height: 100,
-                                    ),
-                                  );
-                                }),
-                              )),
-                            ],
-                          ),
-                        )
-                      : Container(child: Text('NO NO NO')),
-                  Padding(
-                      padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).viewInsets.bottom,
-                        left: 5.0,
-                        right: 5.0,
-                      ),
-                      child: Row(children: [
+                                  ),
+                                ])),
                         SizedBox(
-                          width: 220,
-                          child: TextField(
-                            minLines: 1,
-                            maxLines: 8,
-                            autofocus: false,
-                            controller: myNews,
+                          height: 4.0,
+                        ),
+                        multiPickedImages.length > 0
+                            ? SizedBox(
+                                height: 150,
+                                child: Column(
+                                  children: [
+                                    Expanded(
+                                        child: GridView.count(
+                                      crossAxisCount: 3,
+                                      children: List.generate(
+                                          multiPickedImages.length, (index) {
+                                        Asset asset = multiPickedImages[index];
+                                        return GestureDetector(
+                                          onLongPress: () {
+                                            setModalState(() {
+                                              multiPickedImages.removeAt(index);
+                                            });
+                                          },
+                                          child: AssetThumb(
+                                            asset: asset,
+                                            width: 100,
+                                            height: 100,
+                                          ),
+                                        );
+                                      }),
+                                    )),
+                                  ],
+                                ),
+                              )
+                            : Container(),
+                        Padding(
+                            padding: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).viewInsets.bottom,
+                              left: 5.0,
+                              right: 5.0,
+                            ),
+                            child: Row(children: [
+                              SizedBox(
+                                width: 220,
+                                child: TextField(
+                                  minLines: 1,
+                                  maxLines: 8,
+                                  autofocus: false,
+                                  controller: myNews,
+                                ),
+                              ),
+                              FlatButton(
+                                color: Colors.blue,
+                                child: Text('post'),
+                                onPressed: () {
+                                  setModalState(() {
+                                    isUploading = true;
+                                  });
+                                  _postComment();
+                                },
+                              ),
+                            ])),
+                        SizedBox(height: 50),
+                      ],
+                    ),
+                  )
+                : SizedBox(
+                    child: Center(
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 60,
                           ),
-                        ),
-                        FlatButton(
-                          color: Colors.blue,
-                          child: Text('post'),
-                          onPressed: () {
-                            _postComment();
-                          },
-                        ),
-                      ])),
-                  SizedBox(height: 50),
-                ],
-              ),
-            );
+                          CircularProgressIndicator(),
+                          SizedBox(
+                            height: 40,
+                          ),
+                          Text(
+                            'Posting...',
+                            style: myStyle(21),
+                          )
+                        ],
+                      ),
+                    ),
+                    height: 250,
+                  );
           });
         });
   }

@@ -4,12 +4,14 @@ class UserNewsFeed {
   final String docId;
   final String userName;
   final String userPhone;
+  final double distance;
   final String article;
   final String title;
   final String uid;
   final DateTime time;
   final int unixTime;
   final int shares;
+  final int popularity;
   final GeoPoint location;
   final List<dynamic> likes;
   final List<dynamic> images;
@@ -21,6 +23,8 @@ class UserNewsFeed {
   UserNewsFeed(
       {this.docId,
       this.uid,
+      this.distance,
+      this.popularity,
       this.userName,
       this.userPhone,
       this.article,
@@ -40,6 +44,8 @@ class UserNewsFeed {
     return {
       'docId': docId,
       'uid': uid,
+      'distance': distance,
+      'popularity': popularity,
       'userName': userName,
       'userPhone': userPhone,
       'article': article,
@@ -63,7 +69,9 @@ class UserNewsFeed {
     return UserNewsFeed(
         userName: map['userName'],
         userPhone: map['userPhone'],
+        popularity: map['popularity'],
         uid: map['uid'],
+        distance: map['distance'],
         docId: map['docId'],
         article: map['article'],
         time: map['time'],
