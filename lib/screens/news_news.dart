@@ -160,13 +160,12 @@ class _NewsPageState extends State<NewsPage> {
       //allNews.sort((a, b) => b.likes.length.compareTo(a.likes.length));
       if (timeSort) {
         allNews.sort((a, b) => b.time.compareTo(a.time));
+        newsList = List.from(allNews);
       }
-
-      newsList = allNews;
 
       if (popularitySort) {
         // distanceSort = false;
-        newsList = [];
+        newsList.clear();
         for (var i = 0; i < allNews.length; i++) {
           int likeScore = allNews[i].likes.length;
           int shareScore = allNews[i].shares * 2;
@@ -192,7 +191,7 @@ class _NewsPageState extends State<NewsPage> {
         newsList.sort((a, b) => b.popularity.compareTo(a.popularity));
       }
     }
-    return newsList == null
+    return newsList.length == 0
         ? Center(child: CircularProgressIndicator())
         : Column(
             children: [

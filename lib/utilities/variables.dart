@@ -244,6 +244,8 @@ bool showMapPopup = false;
 
 bool askMeRunning = false;
 
+bool canCompose = false;
+
 List<Asset> multiPickedImages = List<Asset>();
 
 CollectionReference userCollection =

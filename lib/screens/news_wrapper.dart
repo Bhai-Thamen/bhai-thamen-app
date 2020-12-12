@@ -47,6 +47,7 @@ class _NewsWrapperState extends State<NewsWrapper> {
     super.initState();
     getCurrentUserInfo();
     print('MPI ' + multiPickedImages.length.toString());
+    canCompose = true;
   }
 
   getCurrentUserInfo() async {
@@ -309,12 +310,14 @@ class _NewsWrapperState extends State<NewsWrapper> {
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
           actions: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: FlatButton(
-                  child: Image.asset('assets/images/cross.png'),
-                  onPressed: () => doShow()),
-            ),
+            !canCompose
+                ? Container()
+                : Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: FlatButton(
+                        child: Image.asset('assets/images/cross.png'),
+                        onPressed: () => doShow()),
+                  ),
           ],
         ),
         body: Column(
@@ -329,6 +332,11 @@ class _NewsWrapperState extends State<NewsWrapper> {
               //set page variable = to index (0,1 or 2) depending on which button was pressed
               newsPageIndex = index;
               mapIsShowing = false;
+              if (newsPageIndex == 0) {
+                canCompose = true;
+              } else {
+                canCompose = false;
+              }
             });
           },
           fixedColor: Colors.blue[700],
