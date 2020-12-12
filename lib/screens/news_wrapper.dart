@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:bhaithamen/data/news_feed.dart';
 import 'package:bhaithamen/data/user_news_feed.dart';
 import 'package:bhaithamen/screens/multi_picker.dart';
-import 'package:bhaithamen/screens/news.dart';
+import 'package:bhaithamen/screens/news_news.dart';
 import 'package:bhaithamen/screens/user_news.dart';
 import 'package:bhaithamen/utilities/auth.dart';
 import 'package:bhaithamen/utilities/language_data.dart';

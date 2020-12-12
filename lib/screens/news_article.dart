@@ -1,4 +1,4 @@
-import 'package:bhaithamen/data/user_news_feed.dart';
+import 'package:bhaithamen/data/news_feed.dart';
 import 'package:bhaithamen/utilities/variables.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_format/date_format.dart';
@@ -13,27 +13,28 @@ import 'package:carousel_slider/carousel_controller.dart';
 import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
-class UserArticle extends StatefulWidget {
-  final UserNewsFeed userArticle;
-  UserArticle(this.userArticle);
+class NewsArticle extends StatefulWidget {
+  final NewsFeed userArticle;
+  NewsArticle(this.userArticle);
   @override
-  _UserArticleState createState() => _UserArticleState();
+  _NewsArticleState createState() => _NewsArticleState();
 }
 
-class _UserArticleState extends State<UserArticle> {
+class _NewsArticleState extends State<NewsArticle> {
   TextEditingController myComment = TextEditingController();
   FocusNode _focusNode = FocusNode();
   bool bottomPadding = false;
 
   String myUsername;
   String myUid;
-  int myShares;
 
   KeyboardUtils _keyboardUtils = KeyboardUtils();
 
   int _idKeyboardListener;
 
   List<Widget> imageSliders;
+
+  int myShares;
 
   setUpSlider() {
     imageSliders = widget.userArticle.images
@@ -147,7 +148,7 @@ class _UserArticleState extends State<UserArticle> {
     if (myComment.text.replaceAll(' ', '') != '') {
       var addComment = {'username': myUsername, 'comment': myComment.text};
 
-      userNewsCollection.doc(widget.userArticle.docId).update({
+      newsCollection.doc(widget.userArticle.docId).update({
         'comments': FieldValue.arrayUnion([addComment]),
       });
 
@@ -162,17 +163,17 @@ class _UserArticleState extends State<UserArticle> {
   likePost(String docId) async {
     var firebaseuser = FirebaseAuth.instance.currentUser;
     DocumentSnapshot document =
-        await userNewsCollection.doc(widget.userArticle.docId).get();
+        await newsCollection.doc(widget.userArticle.docId).get();
 
     if (document['likes'].contains(firebaseuser.uid)) {
-      userNewsCollection.doc(docId).update({
+      newsCollection.doc(widget.userArticle.docId).update({
         'likes': FieldValue.arrayRemove([firebaseuser.uid]),
       });
       setState(() {
         widget.userArticle.likes.remove(myUid);
       });
     } else {
-      userNewsCollection.doc(docId).update({
+      newsCollection.doc(widget.userArticle.docId).update({
         'likes': FieldValue.arrayUnion([firebaseuser.uid]),
       });
       setState(() {
@@ -189,8 +190,8 @@ class _UserArticleState extends State<UserArticle> {
         'Shared from Bhai Thamen https://bhaithamen.com';
     Share.share(msg, subject: 'Bhai Thamen');
     DocumentSnapshot document =
-        await userNewsCollection.doc(widget.userArticle.docId).get();
-    userNewsCollection.doc(docId).update({'shares': document['shares'] + 1});
+        await newsCollection.doc(widget.userArticle.docId).get();
+    newsCollection.doc(docId).update({'shares': document['shares'] + 1});
     setState(() {
       myShares++;
     });
@@ -245,7 +246,7 @@ class _UserArticleState extends State<UserArticle> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                widget.userArticle.userName,
+                                widget.userArticle.author,
                                 style:
                                     myStyle(18, Colors.blue, FontWeight.w600),
                               ),
@@ -308,8 +309,8 @@ class _UserArticleState extends State<UserArticle> {
                                   Row(
                                     children: [
                                       InkWell(
-                                          onTap: () => likePost(
-                                              widget.userArticle.docId),
+                                          onTap: () =>
+                                              likePost(widget.userArticle.uid),
                                           child: widget.userArticle.likes
                                                   .contains(myUid)
                                               ? Icon(Icons.favorite,

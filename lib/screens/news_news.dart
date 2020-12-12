@@ -1,7 +1,7 @@
 import 'dart:core';
 
 import 'package:bhaithamen/data/news_feed.dart';
-import 'package:bhaithamen/data/user_news_feed.dart';
+import 'package:bhaithamen/screens/news_article.dart';
 import 'package:bhaithamen/screens/user_article.dart';
 import 'package:bhaithamen/utilities/fb_test.dart';
 import 'package:bhaithamen/utilities/language_data.dart';
@@ -19,22 +19,21 @@ import 'package:geodesy/geodesy.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_gallery_grid_fb/image_gallery_grid_fb.dart';
 
-class UserNewsPage extends StatefulWidget {
+class NewsPage extends StatefulWidget {
   @override
-  _UserNewsPageState createState() => _UserNewsPageState();
+  _NewsPageState createState() => _NewsPageState();
 }
 
-class _UserNewsPageState extends State<UserNewsPage> {
+class _NewsPageState extends State<NewsPage> {
   Geodesy geodesy = Geodesy();
 
   String uid;
-  List<bool> isSelected = [true, false, false];
+  List<bool> isSelected = [true, false];
   int selectedIndex = 0;
-  List<UserNewsFeed> newsList = List<UserNewsFeed>();
-  List catChoice = ['news', 'info', 'warn'];
+  List<NewsFeed> newsList = List<NewsFeed>();
+  List catChoice = ['news', 'info'];
 
-  bool distanceSort = true;
-  bool timeSort = false;
+  bool timeSort = true;
   bool popularitySort = false;
   LatLng myLocation;
 
@@ -42,7 +41,6 @@ class _UserNewsPageState extends State<UserNewsPage> {
     super.initState();
     getCurrentUserUID();
     //sendResearchReport('News_Section');
-    sortByDistance();
   }
 
   String getPubDate(DateTime date) {
@@ -86,14 +84,14 @@ class _UserNewsPageState extends State<UserNewsPage> {
 
   likePost(String docId) async {
     var firebaseuser = FirebaseAuth.instance.currentUser;
-    DocumentSnapshot document = await userNewsCollection.doc(docId).get();
+    DocumentSnapshot document = await newsCollection.doc(docId).get();
 
     if (document['likes'].contains(firebaseuser.uid)) {
-      userNewsCollection.doc(docId).update({
+      newsCollection.doc(docId).update({
         'likes': FieldValue.arrayRemove([firebaseuser.uid]),
       });
     } else {
-      userNewsCollection.doc(docId).update({
+      newsCollection.doc(docId).update({
         'likes': FieldValue.arrayUnion([firebaseuser.uid]),
       });
     }
@@ -108,8 +106,8 @@ class _UserNewsPageState extends State<UserNewsPage> {
       print(e);
     }
 
-    DocumentSnapshot document = await userNewsCollection.doc(docId).get();
-    userNewsCollection.doc(docId).update({'shares': document['shares'] + 1});
+    DocumentSnapshot document = await newsCollection.doc(docId).get();
+    newsCollection.doc(docId).update({'shares': document['shares'] + 1});
   }
 
   Future<void> _onOpen(LinkableElement link) async {
@@ -138,23 +136,10 @@ class _UserNewsPageState extends State<UserNewsPage> {
     return loc;
   }
 
-  sortByDistance() async {
-    var geoMyLocation = await getUserLocation();
-    //print(geoMyLocation.longitude);
-    double lat = geoMyLocation.latitude;
-    double lng = geoMyLocation.longitude;
-    setState(() {
-      myLocation = new LatLng(lat, lng);
-      timeSort = false;
-      distanceSort = true;
-      popularitySort = false;
-    });
-  }
-
   sortByTime() async {
     setState(() {
       timeSort = true;
-      distanceSort = false;
+
       popularitySort = false;
     });
   }
@@ -162,65 +147,26 @@ class _UserNewsPageState extends State<UserNewsPage> {
   sortByPopularity() async {
     setState(() {
       timeSort = false;
-      distanceSort = false;
+
       popularitySort = true;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final allNews = Provider.of<List<UserNewsFeed>>(context);
+    final allNews = Provider.of<List<NewsFeed>>(context);
 
     if (allNews != null) {
-      newsList.clear();
       //allNews.sort((a, b) => b.likes.length.compareTo(a.likes.length));
       if (timeSort) {
         allNews.sort((a, b) => b.time.compareTo(a.time));
-        newsList = List.from(allNews);
       }
 
-      if (distanceSort && myLocation != null) {
-        //distanceSort = false;
-        newsList.clear();
-        for (var i = 0; i < allNews.length; i++) {
-          double lat = allNews[i].location.latitude;
-          double lng = allNews[i].location.longitude;
-          LatLng latLng = new LatLng(lat, lng);
-
-          double distance =
-              geodesy.distanceBetweenTwoGeoPoints(myLocation, latLng);
-
-          distance = num.parse(distance.toStringAsFixed(2));
-
-          final newEvent = UserNewsFeed(
-              docId: allNews[i].docId,
-              userName: allNews[i].userName,
-              userPhone: allNews[i].userPhone,
-              distance: distance,
-              article: allNews[i].article,
-              uid: allNews[i].uid,
-              time: allNews[i].time,
-              unixTime: allNews[i].unixTime,
-              shares: allNews[i].shares,
-              location: allNews[i].location,
-              likes: allNews[i].likes,
-              images: allNews[i].images,
-              reports: allNews[i].reports,
-              comments: allNews[i].comments,
-              show: allNews[i].show,
-              profilePic: allNews[i].profilePic);
-
-          if (distance < 50000) {
-            newsList.add(newEvent);
-          }
-        }
-        newsList.sort((b, a) => b.distance.compareTo(a.distance));
-        print(newsList[0].images[0]);
-      }
+      newsList = allNews;
 
       if (popularitySort) {
         // distanceSort = false;
-        newsList.clear();
+        newsList = [];
         for (var i = 0; i < allNews.length; i++) {
           int likeScore = allNews[i].likes.length;
           int shareScore = allNews[i].shares * 2;
@@ -228,31 +174,25 @@ class _UserNewsPageState extends State<UserNewsPage> {
 
           int popularityScore = likeScore + shareScore + commentScore;
 
-          final newEvent = UserNewsFeed(
-              docId: allNews[i].docId,
-              userName: allNews[i].userName,
-              userPhone: allNews[i].userPhone,
-              distance: null,
-              popularity: popularityScore,
-              article: allNews[i].article,
-              uid: allNews[i].uid,
-              time: allNews[i].time,
-              unixTime: allNews[i].unixTime,
-              shares: allNews[i].shares,
-              location: allNews[i].location,
-              likes: allNews[i].likes,
-              images: allNews[i].images,
-              reports: allNews[i].reports,
-              comments: allNews[i].comments,
-              show: allNews[i].show,
-              profilePic: allNews[i].profilePic);
+          final newEvent = NewsFeed(
+            article: allNews[i].article,
+            uid: allNews[i].uid,
+            title: allNews[i].title,
+            time: allNews[i].time,
+            shares: allNews[i].shares,
+            likes: allNews[i].likes,
+            images: allNews[i].images,
+            popularity: popularityScore,
+            comments: allNews[i].comments,
+            show: allNews[i].show,
+          );
 
           newsList.add(newEvent);
         }
         newsList.sort((a, b) => b.popularity.compareTo(a.popularity));
       }
     }
-    return newsList.length == 0
+    return newsList == null
         ? Center(child: CircularProgressIndicator())
         : Column(
             children: [
@@ -272,52 +212,7 @@ class _UserNewsPageState extends State<UserNewsPage> {
                             ? Container(
                                 width:
                                     (MediaQuery.of(context).size.width - 12) /
-                                        3,
-                                child: new Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    new Icon(
-                                      Icons.directions_walk,
-                                      size: 16.0,
-                                      color: Colors.white,
-                                    ),
-                                    new SizedBox(
-                                      width: 4.0,
-                                    ),
-                                    new Text(
-                                      languages[selectedLanguage[languageIndex]]
-                                          ['proximity'],
-                                      style: TextStyle(color: Colors.white),
-                                    )
-                                  ],
-                                ))
-                            : Container(
-                                width:
-                                    (MediaQuery.of(context).size.width - 12) /
-                                        3,
-                                child: new Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    new Icon(
-                                      Icons.directions_walk,
-                                      size: 16.0,
-                                      color: Colors.black,
-                                    ),
-                                    new SizedBox(
-                                      width: 4.0,
-                                    ),
-                                    new Text(
-                                      languages[selectedLanguage[languageIndex]]
-                                          ['proximity'],
-                                      style: TextStyle(color: Colors.black),
-                                    )
-                                  ],
-                                )),
-                        isSelected[1]
-                            ? Container(
-                                width:
-                                    (MediaQuery.of(context).size.width - 12) /
-                                        3,
+                                        2,
                                 child: new Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
@@ -339,7 +234,7 @@ class _UserNewsPageState extends State<UserNewsPage> {
                             : Container(
                                 width:
                                     (MediaQuery.of(context).size.width - 12) /
-                                        3,
+                                        2,
                                 child: new Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
@@ -358,11 +253,11 @@ class _UserNewsPageState extends State<UserNewsPage> {
                                         style: TextStyle(color: Colors.black))
                                   ],
                                 )),
-                        isSelected[2]
+                        isSelected[1]
                             ? Container(
                                 width:
                                     (MediaQuery.of(context).size.width - 12) /
-                                        3,
+                                        2,
                                 child: new Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
@@ -384,7 +279,7 @@ class _UserNewsPageState extends State<UserNewsPage> {
                             : Container(
                                 width:
                                     (MediaQuery.of(context).size.width - 12) /
-                                        3,
+                                        2,
                                 child: new Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
@@ -418,14 +313,10 @@ class _UserNewsPageState extends State<UserNewsPage> {
                             }
                           }
                           if (selectedIndex == 0) {
-                            sortByDistance();
-                            //sendResearchReport('News_Section');
-                          }
-                          if (selectedIndex == 1) {
                             //sendResearchReport('Info_Section');
                             sortByTime();
                           }
-                          if (selectedIndex == 2) {
+                          if (selectedIndex == 1) {
                             sortByPopularity();
                             //sendResearchReport('Alert_Section');
                           }
@@ -444,7 +335,7 @@ class _UserNewsPageState extends State<UserNewsPage> {
                     itemCount: newsList.length,
                     itemBuilder: (BuildContext context, int index) {
                       //DocumentSnapshot feeddoc = allNews[index];
-                      UserNewsFeed feeddoc = newsList[index];
+                      NewsFeed feeddoc = newsList[index];
                       return
                           // feeddoc.show != true
                           //     ? Container()
@@ -456,7 +347,7 @@ class _UserNewsPageState extends State<UserNewsPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => UserArticle(feeddoc),
+                                  builder: (context) => NewsArticle(feeddoc),
                                 ),
                               );
                             },
@@ -474,15 +365,11 @@ class _UserNewsPageState extends State<UserNewsPage> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          feeddoc.userName,
+                                          feeddoc.title,
                                           style: myStyle(
                                               18, Colors.blue, FontWeight.w600),
                                         ),
                                         Text(getPubDate(feeddoc.time)),
-                                        feeddoc.distance != null
-                                            ? Text(feeddoc.distance.toString() +
-                                                ' meters away')
-                                            : Text(''),
                                       ],
                                     ),
                                     subtitle: Column(
@@ -492,99 +379,46 @@ class _UserNewsPageState extends State<UserNewsPage> {
                                         SizedBox(height: 10),
                                         feeddoc.images.length == 0
                                             ? Container()
-                                            : Center(
-                                                child: feeddoc.images.length ==
-                                                        1
-                                                    ? Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .fromLTRB(
-                                                                12, 10, 12, 10),
-                                                        child:
-                                                            CachedNetworkImage(
-                                                          height: 150,
-                                                          imageUrl:
-                                                              feeddoc.images[0],
-                                                          progressIndicatorBuilder:
-                                                              (context, url,
-                                                                      downloadProgress) =>
-                                                                  SizedBox(
-                                                            height: 150,
-                                                            child: Center(
-                                                              child: CircularProgressIndicator(
-                                                                  value: downloadProgress
-                                                                      .progress),
-                                                            ),
-                                                          ),
-                                                          errorWidget: (context,
-                                                                  url, error) =>
-                                                              Icon(Icons.error),
-                                                        ),
-                                                      )
-                                                    : Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .fromLTRB(
-                                                                5, 10, 12, 5),
-                                                        child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceEvenly,
-                                                          children: [
-                                                            CachedNetworkImage(
-                                                              width: MediaQuery.of(
-                                                                          context)
-                                                                      .size
-                                                                      .width /
-                                                                  2.5,
-                                                              imageUrl: feeddoc
-                                                                  .images[0],
-                                                              progressIndicatorBuilder:
-                                                                  (context, url,
-                                                                          downloadProgress) =>
-                                                                      SizedBox(
-                                                                height: 150,
-                                                                child: Center(
-                                                                  child: CircularProgressIndicator(
-                                                                      value: downloadProgress
-                                                                          .progress),
-                                                                ),
-                                                              ),
-                                                              errorWidget: (context,
-                                                                      url,
-                                                                      error) =>
-                                                                  Icon(Icons
-                                                                      .error),
-                                                            ),
-                                                            CachedNetworkImage(
-                                                              width: MediaQuery.of(
-                                                                          context)
-                                                                      .size
-                                                                      .width /
-                                                                  2.5,
-                                                              imageUrl: feeddoc
-                                                                  .images[1],
-                                                              progressIndicatorBuilder:
-                                                                  (context, url,
-                                                                          downloadProgress) =>
-                                                                      SizedBox(
-                                                                height: 150,
-                                                                child: Center(
-                                                                  child: CircularProgressIndicator(
-                                                                      value: downloadProgress
-                                                                          .progress),
-                                                                ),
-                                                              ),
-                                                              errorWidget: (context,
-                                                                      url,
-                                                                      error) =>
-                                                                  Icon(Icons
-                                                                      .error),
-                                                            ),
-                                                          ],
-                                                        ),
+                                            : feeddoc.images.length > 1
+                                                ? GalleryImageGridFb(
+                                                    imageUrls:
+                                                        List<String>.from(
+                                                            feeddoc.images),
+                                                    onTap: () => Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            NewsArticle(
+                                                                feeddoc),
                                                       ),
-                                              ),
+                                                    ),
+                                                  )
+                                                : Center(
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                              .fromLTRB(
+                                                          12, 40, 12, 10),
+                                                      child: CachedNetworkImage(
+                                                        height: 150,
+                                                        imageUrl:
+                                                            feeddoc.images[0],
+                                                        progressIndicatorBuilder:
+                                                            (context, url,
+                                                                    downloadProgress) =>
+                                                                SizedBox(
+                                                          height: 150,
+                                                          child: Center(
+                                                            child: CircularProgressIndicator(
+                                                                value: downloadProgress
+                                                                    .progress),
+                                                          ),
+                                                        ),
+                                                        errorWidget: (context,
+                                                                url, error) =>
+                                                            Icon(Icons.error),
+                                                      ),
+                                                    ),
+                                                  ),
                                         Padding(
                                             padding: const EdgeInsets.fromLTRB(
                                                 20, 0, 20, 10),
@@ -647,7 +481,7 @@ class _UserNewsPageState extends State<UserNewsPage> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            UserArticle(feeddoc),
+                                            NewsArticle(feeddoc),
                                       ),
                                     ),
                                     child: Row(

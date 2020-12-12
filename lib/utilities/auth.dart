@@ -172,15 +172,16 @@ class AuthService {
 
       return NewsFeed(
           time: doc.data()['time'].toDate(),
-          uid: doc.id,
+          docId: doc.id,
           author: doc.data()['author'],
           article: doc.data()['article'],
           likes: doc.data()['likes'],
+          comments: doc.data()['comments'],
           shares: doc.data()['shares'],
           show: doc.data()['show'],
           title: doc.data()['title'],
           category: doc.data()['cat'],
-          image: doc.data()['image']);
+          images: doc.data()['images']);
     }).toList();
   }
 
