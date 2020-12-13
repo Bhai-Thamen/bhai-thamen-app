@@ -1,3 +1,4 @@
+import 'package:bhaithamen/data/alerts_feed.dart';
 import 'package:bhaithamen/data/event.dart';
 import 'package:bhaithamen/data/event_date.dart';
 import 'package:bhaithamen/data/incident_date.dart';
@@ -185,6 +186,23 @@ class AuthService {
     }).toList();
   }
 
+  static List<AlertsFeed> _alertsFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.docs.map((doc) {
+      // DateTime date =
+      //     new DateTime.fromMillisecondsSinceEpoch(doc.data()['time']);
+
+      return AlertsFeed(
+          time: doc.data()['time'].toDate(),
+          docId: doc.id,
+          article: doc.data()['article'],
+          likes: doc.data()['likes'],
+          shares: doc.data()['shares'],
+          show: doc.data()['show'],
+          title: doc.data()['title'],
+          image: doc.data()['image']);
+    }).toList();
+  }
+
   static List<UserNewsFeed> _userNewsFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
       return UserNewsFeed(
@@ -219,6 +237,10 @@ class AuthService {
     //var user =  auth.FirebaseAuth.instance.currentUser;
 
     return userCollection.doc(uid).snapshots().map(_userDataFromSnapshot);
+  }
+
+  Stream<List<AlertsFeed>> get getAlerts {
+    return alertsNewsCollection.snapshots().map(_alertsFromSnapshot);
   }
 
   Stream<List<NewsFeed>> get getNews {

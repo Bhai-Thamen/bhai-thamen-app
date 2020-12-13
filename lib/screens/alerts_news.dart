@@ -1,5 +1,6 @@
 import 'dart:core';
 
+import 'package:bhaithamen/data/alerts_feed.dart';
 import 'package:bhaithamen/data/news_feed.dart';
 import 'package:bhaithamen/screens/news_article.dart';
 import 'package:bhaithamen/screens/user_article.dart';
@@ -19,18 +20,18 @@ import 'package:geodesy/geodesy.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_gallery_grid_fb/image_gallery_grid_fb.dart';
 
-class NewsPage extends StatefulWidget {
+class AlertsNewsPage extends StatefulWidget {
   @override
-  _NewsPageState createState() => _NewsPageState();
+  _AlertsNewsPageState createState() => _AlertsNewsPageState();
 }
 
-class _NewsPageState extends State<NewsPage> {
+class _AlertsNewsPageState extends State<AlertsNewsPage> {
   Geodesy geodesy = Geodesy();
 
   String uid;
   List<bool> isSelected = [true, false];
   int selectedIndex = 0;
-  List<NewsFeed> newsList = List<NewsFeed>();
+  List<AlertsFeed> newsList = List<AlertsFeed>();
   List catChoice = ['news', 'info'];
 
   bool timeSort = true;
@@ -83,15 +84,17 @@ class _NewsPageState extends State<NewsPage> {
   }
 
   likePost(String docId) async {
+    print('like id ' + docId);
+
     var firebaseuser = FirebaseAuth.instance.currentUser;
-    DocumentSnapshot document = await newsCollection.doc(docId).get();
+    DocumentSnapshot document = await alertsNewsCollection.doc(docId).get();
 
     if (document['likes'].contains(firebaseuser.uid)) {
-      newsCollection.doc(docId).update({
+      alertsNewsCollection.doc(docId).update({
         'likes': FieldValue.arrayRemove([firebaseuser.uid]),
       });
     } else {
-      newsCollection.doc(docId).update({
+      alertsNewsCollection.doc(docId).update({
         'likes': FieldValue.arrayUnion([firebaseuser.uid]),
       });
     }
@@ -106,8 +109,8 @@ class _NewsPageState extends State<NewsPage> {
       print(e);
     }
 
-    DocumentSnapshot document = await newsCollection.doc(docId).get();
-    newsCollection.doc(docId).update({'shares': document['shares'] + 1});
+    DocumentSnapshot document = await alertsNewsCollection.doc(docId).get();
+    alertsNewsCollection.doc(docId).update({'shares': document['shares'] + 1});
   }
 
   Future<void> _onOpen(LinkableElement link) async {
@@ -154,7 +157,7 @@ class _NewsPageState extends State<NewsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final allNews = Provider.of<List<NewsFeed>>(context);
+    final allNews = Provider.of<List<AlertsFeed>>(context);
 
     if (allNews != null) {
       //allNews.sort((a, b) => b.likes.length.compareTo(a.likes.length));
@@ -169,21 +172,18 @@ class _NewsPageState extends State<NewsPage> {
         for (var i = 0; i < allNews.length; i++) {
           int likeScore = allNews[i].likes.length;
           int shareScore = allNews[i].shares * 2;
-          int commentScore = allNews[i].comments.length * 3;
 
-          int popularityScore = likeScore + shareScore + commentScore;
+          int popularityScore = likeScore + shareScore;
 
-          final newEvent = NewsFeed(
+          final newEvent = AlertsFeed(
             docId: allNews[i].docId,
             article: allNews[i].article,
-            uid: allNews[i].uid,
             title: allNews[i].title,
             time: allNews[i].time,
             shares: allNews[i].shares,
             likes: allNews[i].likes,
-            images: allNews[i].images,
+            image: allNews[i].image,
             popularity: popularityScore,
-            comments: allNews[i].comments,
             show: allNews[i].show,
           );
 
@@ -335,7 +335,7 @@ class _NewsPageState extends State<NewsPage> {
                     itemCount: newsList.length,
                     itemBuilder: (BuildContext context, int index) {
                       //DocumentSnapshot feeddoc = allNews[index];
-                      NewsFeed feeddoc = newsList[index];
+                      AlertsFeed feeddoc = newsList[index];
                       return
                           // feeddoc.show != true
                           //     ? Container()
@@ -343,98 +343,41 @@ class _NewsPageState extends State<NewsPage> {
                           Column(
                         children: [
                           GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => NewsArticle(feeddoc),
-                                ),
-                              );
-                            },
+                            onTap: () {},
                             child: Card(
                                 margin: EdgeInsets.fromLTRB(5, 10, 5, 0),
                                 child: ListTile(
-                                    // leading: CircleAvatar(
-                                    //   backgroundColor: Colors.white,
-                                    //   backgroundImage: feeddoc['profilepic'] == 'default'
-                                    //       ? AssetImage('images/defaultAvatar.png')
-                                    //       : NetworkImage(feeddoc['profilepic']),
-                                    // ),
-                                    title: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          feeddoc.title,
-                                          style: myStyle(
-                                              18, Colors.blue, FontWeight.w600),
-                                        ),
-                                        Text(getPubDate(feeddoc.time)),
-                                      ],
-                                    ),
-                                    subtitle: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(height: 10),
-                                        feeddoc.images.length == 0
-                                            ? Container()
-                                            : feeddoc.images.length > 1
-                                                ? GalleryImageGridFb(
-                                                    imageUrls:
-                                                        List<String>.from(
-                                                            feeddoc.images),
-                                                    onTap: () => Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            NewsArticle(
-                                                                feeddoc),
-                                                      ),
-                                                    ),
-                                                  )
-                                                : Center(
-                                                    child: Padding(
-                                                      padding: const EdgeInsets
-                                                              .fromLTRB(
-                                                          12, 40, 12, 10),
-                                                      child: CachedNetworkImage(
-                                                        height: 150,
-                                                        imageUrl:
-                                                            feeddoc.images[0],
-                                                        progressIndicatorBuilder:
-                                                            (context, url,
-                                                                    downloadProgress) =>
-                                                                SizedBox(
-                                                          height: 150,
-                                                          child: Center(
-                                                            child: CircularProgressIndicator(
-                                                                value: downloadProgress
-                                                                    .progress),
-                                                          ),
-                                                        ),
-                                                        errorWidget: (context,
-                                                                url, error) =>
-                                                            Icon(Icons.error),
-                                                      ),
-                                                    ),
-                                                  ),
-                                        Padding(
-                                            padding: const EdgeInsets.fromLTRB(
-                                                20, 0, 20, 10),
-                                            child: Linkify(
-                                                onOpen: _onOpen,
-                                                text: feeddoc.article.length >
-                                                        100
-                                                    ? feeddoc.article
-                                                            .substring(0, 100) +
-                                                        '...'
-                                                    : feeddoc.article,
-                                                style: myStyle(16, Colors.black,
-                                                    FontWeight.w400))),
-                                        SizedBox(height: 10),
-                                      ],
-                                    ))),
+                                  leading: CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    backgroundImage: feeddoc.image == ''
+                                        ? AssetImage('images/defaultAvatar.png')
+                                        : NetworkImage(feeddoc.image),
+                                  ),
+                                  title: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        feeddoc.title,
+                                        style: myStyle(
+                                            18, Colors.blue, FontWeight.w600),
+                                      ),
+                                      Text(getPubDate(feeddoc.time)),
+                                    ],
+                                  ),
+                                  subtitle: Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          20, 0, 20, 10),
+                                      child: Linkify(
+                                          onOpen: _onOpen,
+                                          text: feeddoc.article.length > 100
+                                              ? feeddoc.article
+                                                      .substring(0, 100) +
+                                                  '...'
+                                              : feeddoc.article,
+                                          style: myStyle(16, Colors.black,
+                                              FontWeight.w400))),
+                                )),
                           ),
                           Card(
                             margin: EdgeInsets.fromLTRB(5, 5, 5, 10),
@@ -470,26 +413,6 @@ class _NewsPageState extends State<NewsPage> {
                                         Icon(Icons.share, size: 20),
                                         SizedBox(width: 10),
                                         Text(feeddoc.shares.toString(),
-                                            style:
-                                                myStyle(16, Colors.grey[600])),
-                                      ],
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  InkWell(
-                                    onTap: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            NewsArticle(feeddoc),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.comment_bank_outlined,
-                                            size: 20),
-                                        SizedBox(width: 10),
-                                        Text(feeddoc.comments.length.toString(),
                                             style:
                                                 myStyle(16, Colors.grey[600])),
                                       ],

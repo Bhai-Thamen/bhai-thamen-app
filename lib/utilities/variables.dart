@@ -246,6 +246,8 @@ bool askMeRunning = false;
 
 bool canCompose = false;
 
+bool myNewsOnly = true;
+
 List<Asset> multiPickedImages = List<Asset>();
 
 CollectionReference userCollection =
@@ -277,6 +279,9 @@ CollectionReference newsCollection =
 
 CollectionReference userNewsCollection =
     FirebaseFirestore.instance.collection('usernews');
+
+CollectionReference alertsNewsCollection =
+    FirebaseFirestore.instance.collection('alertsfeed');
 
 StorageReference userStorage = FirebaseStorage.instance.ref().child('users');
 

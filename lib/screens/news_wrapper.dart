@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:bhaithamen/data/alerts_feed.dart';
 import 'package:bhaithamen/data/news_feed.dart';
 import 'package:bhaithamen/data/user_news_feed.dart';
+import 'package:bhaithamen/screens/alerts_news.dart';
 import 'package:bhaithamen/screens/multi_picker.dart';
 import 'package:bhaithamen/screens/news_news.dart';
 import 'package:bhaithamen/screens/user_news.dart';
@@ -85,7 +87,7 @@ class _NewsWrapperState extends State<NewsWrapper> {
     String savePath = uid + '/' + imgUid + '.jpg';
 
     ByteData byteData = await asset.getByteData(
-        quality: 20); // requestOriginal is being deprecated
+        quality: 10); // requestOriginal is being deprecated
     List<int> imageData = byteData.buffer.asUint8List();
     StorageReference ref = userNews.child(savePath);
     // To be aligned with the latest firebase API(4.0)
@@ -142,7 +144,12 @@ class _NewsWrapperState extends State<NewsWrapper> {
 
   int newsPageIndex = 0;
 
-  List newsPageOptions = [UserNewsPage(), NewsPage(), NewsPage()];
+  List newsPageOptions = [
+    UserNewsPage(false),
+    NewsPage(),
+    AlertsNewsPage(),
+    UserNewsPage(true)
+  ];
 
   Widget buildGridView() {
     return GridView.count(
@@ -305,6 +312,8 @@ class _NewsWrapperState extends State<NewsWrapper> {
             value: AuthService(uid: uid).getNews),
         StreamProvider<List<UserNewsFeed>>.value(
             value: AuthService(uid: uid).getUserNews),
+        StreamProvider<List<AlertsFeed>>.value(
+            value: AuthService(uid: uid).getAlerts),
       ],
       child: Scaffold(
         resizeToAvoidBottomInset: true,
@@ -314,9 +323,19 @@ class _NewsWrapperState extends State<NewsWrapper> {
                 ? Container()
                 : Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: FlatButton(
-                        child: Image.asset('assets/images/cross.png'),
-                        onPressed: () => doShow()),
+                    child: MaterialButton(
+                      onPressed: () {
+                        doShow();
+                      },
+                      color: Colors.white,
+                      textColor: Colors.blue,
+                      child: Icon(
+                        Icons.edit,
+                        size: 24,
+                      ),
+                      //padding: EdgeInsets.all(16),
+                      shape: CircleBorder(),
+                    ),
                   ),
           ],
         ),
@@ -332,7 +351,7 @@ class _NewsWrapperState extends State<NewsWrapper> {
               //set page variable = to index (0,1 or 2) depending on which button was pressed
               newsPageIndex = index;
               mapIsShowing = false;
-              if (newsPageIndex == 0) {
+              if (newsPageIndex == 0 || newsPageIndex == 3) {
                 canCompose = true;
               } else {
                 canCompose = false;
@@ -363,6 +382,11 @@ class _NewsWrapperState extends State<NewsWrapper> {
                     ? Icon(Icons.warning_amber_outlined, size: 26)
                     : Icon(Icons.warning_amber_outlined, size: 22),
                 label: languages[selectedLanguage[languageIndex]]['warn']),
+            BottomNavigationBarItem(
+                icon: newsPageIndex == 3
+                    ? Icon(Icons.person, size: 26)
+                    : Icon(Icons.person, size: 22),
+                label: languages[selectedLanguage[languageIndex]]['myposts'])
           ],
         ),
       ),

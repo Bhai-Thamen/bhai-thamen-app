@@ -1,8 +1,11 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bhaithamen/data/user_news_feed.dart';
+import 'package:bhaithamen/utilities/language_data.dart';
 import 'package:bhaithamen/utilities/variables.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_format/date_format.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:share/share.dart';
@@ -204,19 +207,89 @@ class _UserArticleState extends State<UserArticle> {
     }
   }
 
+  Future<bool> _askDelete(BuildContext context) {
+    return showDialog(
+        context: context,
+        child: AlertDialog(
+            title: Text(
+                languages[selectedLanguage[languageIndex]]['askDeletePost1']),
+            content: Container(
+                height: 180,
+                width: 320,
+                child: Center(
+                      child: Column(
+                        children: [
+                          Text(
+                              languages[selectedLanguage[languageIndex]]
+                                  ['askDeletePost2'],
+                              style: myStyle(20, Colors.red, FontWeight.w400)),
+                          SizedBox(height: 30),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Spacer(),
+                              FlatButton(
+                                child: Text(
+                                    languages[selectedLanguage[languageIndex]]
+                                        ['yes'],
+                                    style: myStyle(14, Colors.white)),
+                                textColor: Colors.white,
+                                color: Colors.green,
+                                onPressed: () async {
+                                  _doDelete();
+                                },
+                              ),
+                              SizedBox(width: 14),
+                              FlatButton(
+                                child: AutoSizeText(
+                                    languages[selectedLanguage[languageIndex]]
+                                        ['no'],
+                                    maxLines: 2,
+                                    style: myStyle(14, Colors.white)),
+                                textColor: Colors.white,
+                                color: Colors.red,
+                                onPressed: () async {
+                                  //analyticsHelper.sendAnalyticsEvent('Sign_Out');
+                                  //await sendResearchReport('Sign_Out');
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ) ??
+                    false)));
+  }
+
+  _doDelete() async {
+    for (var i = 0; i < widget.userArticle.images.length; i++) {
+      FirebaseStorage.instance
+          .getReferenceFromUrl(widget.userArticle.images[i])
+          .then((reference) => reference.delete())
+          .catchError((e) => print(e));
+    }
+
+    userNewsCollection.doc(widget.userArticle.docId).delete().then((done) {
+      print('Delete DONE');
+      Navigator.pop(context);
+      Navigator.pop(context);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: FlatButton(
-              child: Image.asset('assets/images/cross.png'),
-              onPressed: () {},
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.all(8.0),
+          //   child: FlatButton(
+          //     child: Image.asset('assets/images/cross.png'),
+          //     onPressed: () {},
+          //   ),
+          // ),
         ],
       ),
       body: InkWell(
@@ -341,8 +414,7 @@ class _UserArticleState extends State<UserArticle> {
                                   Row(
                                     children: [
                                       InkWell(
-                                          onTap: () => likePost(
-                                              widget.userArticle.docId),
+                                          onTap: () {},
                                           child: Icon(
                                               Icons.comment_bank_outlined,
                                               size: 20)),
@@ -354,6 +426,15 @@ class _UserArticleState extends State<UserArticle> {
                                     ],
                                   ),
                                   Spacer(),
+                                  widget.userArticle.uid == myUid
+                                      ? InkWell(
+                                          onTap: () {
+                                            _askDelete(context);
+                                          },
+                                          child: Icon(Icons.delete,
+                                              color: Colors.red[700]),
+                                        )
+                                      : Container(),
                                 ],
                               ),
                             ],

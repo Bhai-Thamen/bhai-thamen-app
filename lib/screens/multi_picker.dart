@@ -66,8 +66,6 @@ class _MultiImagePickerScreenState extends State<MultiImagePickerScreen> {
 
     multiPickedImages = resultList;
 
-    print(multiPickedImages[0]);
-
     Navigator.pop(context);
 
     // setState(() {

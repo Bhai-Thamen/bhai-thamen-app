@@ -20,6 +20,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_gallery_grid_fb/image_gallery_grid_fb.dart';
 
 class UserNewsPage extends StatefulWidget {
+  bool showMyNews;
+  UserNewsPage(this.showMyNews);
   @override
   _UserNewsPageState createState() => _UserNewsPageState();
 }
@@ -31,6 +33,7 @@ class _UserNewsPageState extends State<UserNewsPage> {
   List<bool> isSelected = [true, false, false];
   int selectedIndex = 0;
   List<UserNewsFeed> newsList = List<UserNewsFeed>();
+  List<UserNewsFeed> myNewsList = List<UserNewsFeed>();
   List catChoice = ['news', 'info', 'warn'];
 
   bool distanceSort = true;
@@ -189,20 +192,29 @@ class _UserNewsPageState extends State<UserNewsPage> {
   Widget build(BuildContext context) {
     final allNews = Provider.of<List<UserNewsFeed>>(context);
 
+    newsList.clear();
+
     if (allNews != null) {
-      newsList.clear();
+      if (widget.showMyNews) {
+        myNewsList = allNews.where((i) => i.uid == uid).toList();
+      } else {
+        myNewsList = List.from(allNews);
+      }
+    }
+
+    if (allNews != null) {
       //allNews.sort((a, b) => b.likes.length.compareTo(a.likes.length));
       if (timeSort) {
-        allNews.sort((a, b) => b.time.compareTo(a.time));
-        newsList = List.from(allNews);
+        myNewsList.sort((a, b) => b.time.compareTo(a.time));
+        newsList = List.from(myNewsList);
       }
 
       if (distanceSort && myLocation != null) {
         //distanceSort = false;
-        newsList.clear();
-        for (var i = 0; i < allNews.length; i++) {
-          double lat = allNews[i].location.latitude;
-          double lng = allNews[i].location.longitude;
+
+        for (var i = 0; i < myNewsList.length; i++) {
+          double lat = myNewsList[i].location.latitude;
+          double lng = myNewsList[i].location.longitude;
           LatLng latLng = new LatLng(lat, lng);
 
           double distance =
@@ -211,59 +223,58 @@ class _UserNewsPageState extends State<UserNewsPage> {
           distance = num.parse(distance.toStringAsFixed(2));
 
           final newEvent = UserNewsFeed(
-              docId: allNews[i].docId,
-              userName: allNews[i].userName,
-              userPhone: allNews[i].userPhone,
+              docId: myNewsList[i].docId,
+              userName: myNewsList[i].userName,
+              userPhone: myNewsList[i].userPhone,
               distance: distance,
-              article: allNews[i].article,
-              uid: allNews[i].uid,
-              time: allNews[i].time,
-              unixTime: allNews[i].unixTime,
-              shares: allNews[i].shares,
-              location: allNews[i].location,
-              likes: allNews[i].likes,
-              images: allNews[i].images,
-              reports: allNews[i].reports,
-              comments: allNews[i].comments,
-              show: allNews[i].show,
-              profilePic: allNews[i].profilePic);
+              article: myNewsList[i].article,
+              uid: myNewsList[i].uid,
+              time: myNewsList[i].time,
+              unixTime: myNewsList[i].unixTime,
+              shares: myNewsList[i].shares,
+              location: myNewsList[i].location,
+              likes: myNewsList[i].likes,
+              images: myNewsList[i].images,
+              reports: myNewsList[i].reports,
+              comments: myNewsList[i].comments,
+              show: myNewsList[i].show,
+              profilePic: myNewsList[i].profilePic);
 
           if (distance < 50000) {
             newsList.add(newEvent);
           }
         }
         newsList.sort((b, a) => b.distance.compareTo(a.distance));
-        print(newsList[0].images[0]);
       }
 
       if (popularitySort) {
         // distanceSort = false;
-        newsList.clear();
-        for (var i = 0; i < allNews.length; i++) {
-          int likeScore = allNews[i].likes.length;
-          int shareScore = allNews[i].shares * 2;
-          int commentScore = allNews[i].comments.length * 3;
+
+        for (var i = 0; i < myNewsList.length; i++) {
+          int likeScore = myNewsList[i].likes.length;
+          int shareScore = myNewsList[i].shares * 2;
+          int commentScore = myNewsList[i].comments.length * 3;
 
           int popularityScore = likeScore + shareScore + commentScore;
 
           final newEvent = UserNewsFeed(
-              docId: allNews[i].docId,
-              userName: allNews[i].userName,
-              userPhone: allNews[i].userPhone,
+              docId: myNewsList[i].docId,
+              userName: myNewsList[i].userName,
+              userPhone: myNewsList[i].userPhone,
               distance: null,
               popularity: popularityScore,
-              article: allNews[i].article,
-              uid: allNews[i].uid,
-              time: allNews[i].time,
-              unixTime: allNews[i].unixTime,
-              shares: allNews[i].shares,
-              location: allNews[i].location,
-              likes: allNews[i].likes,
-              images: allNews[i].images,
-              reports: allNews[i].reports,
-              comments: allNews[i].comments,
-              show: allNews[i].show,
-              profilePic: allNews[i].profilePic);
+              article: myNewsList[i].article,
+              uid: myNewsList[i].uid,
+              time: myNewsList[i].time,
+              unixTime: myNewsList[i].unixTime,
+              shares: myNewsList[i].shares,
+              location: myNewsList[i].location,
+              likes: myNewsList[i].likes,
+              images: myNewsList[i].images,
+              reports: myNewsList[i].reports,
+              comments: myNewsList[i].comments,
+              show: myNewsList[i].show,
+              profilePic: myNewsList[i].profilePic);
 
           newsList.add(newEvent);
         }

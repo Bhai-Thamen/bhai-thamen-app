@@ -211,13 +211,13 @@ class _NewsArticleState extends State<NewsArticle> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: FlatButton(
-              child: Image.asset('assets/images/cross.png'),
-              onPressed: () {},
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.all(8.0),
+          //   child: FlatButton(
+          //     child: Image.asset('assets/images/cross.png'),
+          //     onPressed: () {},
+          //   ),
+          // ),
         ],
       ),
       body: InkWell(

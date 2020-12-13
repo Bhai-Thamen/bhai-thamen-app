@@ -176,7 +176,10 @@ Map<String, String> english = {
   'community': 'Community',
   'proximity': 'prox',
   'popular': 'popular',
-  'recent': 'recent'
+  'recent': 'recent',
+  'myposts': 'My Posts',
+  'askDeletePost1': 'DELETE POST',
+  'askDeletePost2': 'Do you want to delete this post?'
 };
 
 Map<String, String> bangla = {
@@ -360,7 +363,11 @@ Map<String, String> bangla = {
   'community': 'সম্প্রদায়',
   'proximity': 'prox',
   'popular': 'popular',
-  'recent': 'recent'
+  'recent': 'recent',
+  'myposts': 'My Posts',
+
+  'askDeletePost1': 'DELETE POST',
+  'askDeletePost2': 'Do you want to delete this post?'
 };
 
 Map<String, Map<String, String>> languages = {
