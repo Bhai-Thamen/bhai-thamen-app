@@ -167,6 +167,24 @@ class _UserNewsPageState extends State<UserNewsPage> {
     });
   }
 
+  Future<void> openMap(double latitude, double longitude) async {
+    var geoMyLocation = await getUserLocation();
+    //print(geoMyLocation.longitude);
+    double lat = geoMyLocation.latitude;
+    double long = geoMyLocation.longitude;
+
+    var url =
+        'https://www.google.com/maps/dir/?api=1&origin=$lat,$long&destination=$latitude,$longitude';
+
+    String googleUrl = url;
+    //'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+    if (await canLaunch(googleUrl)) {
+      await launch(googleUrl);
+    } else {
+      throw 'Could not open the map.';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final allNews = Provider.of<List<UserNewsFeed>>(context);
@@ -479,10 +497,25 @@ class _UserNewsPageState extends State<UserNewsPage> {
                                               18, Colors.blue, FontWeight.w600),
                                         ),
                                         Text(getPubDate(feeddoc.time)),
-                                        feeddoc.distance != null
-                                            ? Text(feeddoc.distance.toString() +
-                                                ' meters away')
-                                            : Text(''),
+                                        InkWell(
+                                          onTap: () async {
+                                            await openMap(
+                                                feeddoc.location.latitude,
+                                                feeddoc.location.longitude);
+                                          },
+                                          child: Row(children: [
+                                            feeddoc.distance != null
+                                                ? Icon(Icons.map)
+                                                : Container(),
+                                            feeddoc.distance != null
+                                                ? Text(feeddoc.distance
+                                                        .toString() +
+                                                    ' meters away')
+                                                : Text(''),
+
+                                            // https://www.google.com/maps/search/?api=1&query=
+                                          ]),
+                                        )
                                       ],
                                     ),
                                     subtitle: Column(
