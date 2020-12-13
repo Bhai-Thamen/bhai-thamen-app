@@ -179,7 +179,9 @@ Map<String, String> english = {
   'recent': 'recent',
   'myposts': 'My Posts',
   'askDeletePost1': 'DELETE POST',
-  'askDeletePost2': 'Do you want to delete this post?'
+  'askDeletePost2': 'Do you want to delete this post?',
+  'locationSharingStatusOff': 'Location Sharing OFF',
+  'locationSharingStatusOn': 'Location Sharing ON',
 };
 
 Map<String, String> bangla = {
@@ -365,6 +367,8 @@ Map<String, String> bangla = {
   'popular': 'popular',
   'recent': 'recent',
   'myposts': 'My Posts',
+  'locationSharingStatusOff': 'Location Sharing OFF',
+  'locationSharingStatusOn': 'Location Sharing ON',
 
   'askDeletePost1': 'DELETE POST',
   'askDeletePost2': 'Do you want to delete this post?'

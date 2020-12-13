@@ -43,6 +43,7 @@ class _NewsWrapperState extends State<NewsWrapper> {
   String userEmail = '';
   String profilePic = '';
   bool isUploading = false;
+  bool shareLocation = false;
   var uuid = Uuid();
 
   initState() {
@@ -106,9 +107,12 @@ class _NewsWrapperState extends State<NewsWrapper> {
         dynamic url = await saveImage(multiPickedImages[i]);
         imageUrls.add(url);
       }
-      reportLocation = await getUserLocation();
-      //print(imageUrls);
-      //print(reportLocation);
+
+      if (shareLocation == true) {
+        reportLocation = await getUserLocation();
+      } else {
+        reportLocation = null;
+      }
 
       int unixDate = getDate().toUtc().millisecondsSinceEpoch;
 
@@ -168,6 +172,12 @@ class _NewsWrapperState extends State<NewsWrapper> {
         );
       }),
     );
+  }
+
+  _switchLocationSharing(bool share) {
+    setState(() {
+      shareLocation = !shareLocation;
+    });
   }
 
   doShow() {
@@ -234,6 +244,29 @@ class _NewsWrapperState extends State<NewsWrapper> {
                                 ),
                               )
                             : Container(),
+                        SizedBox(height: 20),
+                        Row(
+                          children: [
+                            shareLocation
+                                ? Text(
+                                    languages[selectedLanguage[languageIndex]]
+                                        ['locationSharingStatusOn'],
+                                    style: myStyle(18))
+                                : Text(
+                                    languages[selectedLanguage[languageIndex]]
+                                        ['locationSharingStatusOff'],
+                                    style: myStyle(18)),
+                            Switch(
+                                activeColor: Colors.red[500],
+                                inactiveThumbColor: Colors.black54,
+                                value: shareLocation,
+                                onChanged: (bool val) {
+                                  setModalState(() {
+                                    shareLocation = !shareLocation;
+                                  });
+                                }),
+                          ],
+                        ),
                         Padding(
                             padding: EdgeInsets.only(
                               bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -325,6 +358,7 @@ class _NewsWrapperState extends State<NewsWrapper> {
                     padding: const EdgeInsets.all(8.0),
                     child: MaterialButton(
                       onPressed: () {
+                        shareLocation = false;
                         doShow();
                       },
                       color: Colors.white,
@@ -346,7 +380,9 @@ class _NewsWrapperState extends State<NewsWrapper> {
         ),
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
+
           onTap: (index) {
+            //userNews.scrollToTop();
             setState(() {
               //set page variable = to index (0,1 or 2) depending on which button was pressed
               newsPageIndex = index;

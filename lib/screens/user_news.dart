@@ -20,10 +20,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_gallery_grid_fb/image_gallery_grid_fb.dart';
 
 class UserNewsPage extends StatefulWidget {
-  bool showMyNews;
+  final bool showMyNews;
   UserNewsPage(this.showMyNews);
+  _UserNewsPageState myAppState = new _UserNewsPageState();
   @override
   _UserNewsPageState createState() => _UserNewsPageState();
+  void scrollToTop() {
+    myAppState.scrollToTop();
+  }
 }
 
 class _UserNewsPageState extends State<UserNewsPage> {
@@ -40,6 +44,8 @@ class _UserNewsPageState extends State<UserNewsPage> {
   bool timeSort = false;
   bool popularitySort = false;
   LatLng myLocation;
+
+  ScrollController _scrollController = new ScrollController();
 
   initState() {
     super.initState();
@@ -188,6 +194,14 @@ class _UserNewsPageState extends State<UserNewsPage> {
     }
   }
 
+  scrollToTop() {
+    _scrollController.animateTo(
+      0.0,
+      curve: Curves.easeOut,
+      duration: const Duration(milliseconds: 300),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final allNews = Provider.of<List<UserNewsFeed>>(context);
@@ -213,35 +227,37 @@ class _UserNewsPageState extends State<UserNewsPage> {
         //distanceSort = false;
 
         for (var i = 0; i < myNewsList.length; i++) {
-          double lat = myNewsList[i].location.latitude;
-          double lng = myNewsList[i].location.longitude;
-          LatLng latLng = new LatLng(lat, lng);
+          if (myNewsList[i].location != null) {
+            double lat = myNewsList[i].location.latitude;
+            double lng = myNewsList[i].location.longitude;
+            LatLng latLng = new LatLng(lat, lng);
 
-          double distance =
-              geodesy.distanceBetweenTwoGeoPoints(myLocation, latLng);
+            double distance =
+                geodesy.distanceBetweenTwoGeoPoints(myLocation, latLng);
 
-          distance = num.parse(distance.toStringAsFixed(2));
+            distance = num.parse(distance.toStringAsFixed(2));
 
-          final newEvent = UserNewsFeed(
-              docId: myNewsList[i].docId,
-              userName: myNewsList[i].userName,
-              userPhone: myNewsList[i].userPhone,
-              distance: distance,
-              article: myNewsList[i].article,
-              uid: myNewsList[i].uid,
-              time: myNewsList[i].time,
-              unixTime: myNewsList[i].unixTime,
-              shares: myNewsList[i].shares,
-              location: myNewsList[i].location,
-              likes: myNewsList[i].likes,
-              images: myNewsList[i].images,
-              reports: myNewsList[i].reports,
-              comments: myNewsList[i].comments,
-              show: myNewsList[i].show,
-              profilePic: myNewsList[i].profilePic);
+            final newEvent = UserNewsFeed(
+                docId: myNewsList[i].docId,
+                userName: myNewsList[i].userName,
+                userPhone: myNewsList[i].userPhone,
+                distance: distance,
+                article: myNewsList[i].article,
+                uid: myNewsList[i].uid,
+                time: myNewsList[i].time,
+                unixTime: myNewsList[i].unixTime,
+                shares: myNewsList[i].shares,
+                location: myNewsList[i].location,
+                likes: myNewsList[i].likes,
+                images: myNewsList[i].images,
+                reports: myNewsList[i].reports,
+                comments: myNewsList[i].comments,
+                show: myNewsList[i].show,
+                profilePic: myNewsList[i].profilePic);
 
-          if (distance < 50000) {
-            newsList.add(newEvent);
+            if (distance < 50000) {
+              newsList.add(newEvent);
+            }
           }
         }
         newsList.sort((b, a) => b.distance.compareTo(a.distance));
@@ -470,6 +486,7 @@ class _UserNewsPageState extends State<UserNewsPage> {
                     kBottomNavigationBarHeight -
                     150,
                 child: ListView.builder(
+                    controller: _scrollController,
                     itemCount: newsList.length,
                     itemBuilder: (BuildContext context, int index) {
                       //DocumentSnapshot feeddoc = allNews[index];
