@@ -9,17 +9,23 @@ import 'package:bhaithamen/screens/news_wrapper.dart';
 import 'package:bhaithamen/screens/safe.dart';
 import 'package:bhaithamen/screens/settings_wrapper.dart';
 import 'package:bhaithamen/screens/sos.dart';
+import 'package:bhaithamen/screens/welfare_check.dart';
 import 'package:bhaithamen/utilities/analytics_service.dart';
 import 'package:bhaithamen/utilities/auth.dart';
 import 'package:bhaithamen/utilities/auto_page_navigation.dart';
 import 'package:bhaithamen/utilities/language_data.dart';
+import 'package:bhaithamen/utilities/push_notification.dart';
+import 'package:bhaithamen/utilities/report_event.dart';
 import 'package:bhaithamen/utilities/variables.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+
+import '../main.dart';
 
 class Home extends StatefulWidget {
   final User user;
@@ -194,12 +200,18 @@ class _HomeState extends State<Home> {
     Navigator.push(context, route).then(onGoBack);
   }
 
+  void testNoti() {
+    print('GOT NOTI');
+  }
+
   @override
   Widget build(BuildContext context) {
     final AutoHomePageMapSelect homePageMap =
         Provider.of<AutoHomePageMapSelect>(context);
     final AutoHomePageAskSelect homePageAsk =
         Provider.of<AutoHomePageAskSelect>(context);
+    final AutoHomePageWelfareSelect homePageWelfare =
+        Provider.of<AutoHomePageWelfareSelect>(context);
     final SafePageIndex safePageIndex = Provider.of<SafePageIndex>(context);
 
     print('home user ' + widget.user.uid);
@@ -218,6 +230,9 @@ class _HomeState extends State<Home> {
               padding: const EdgeInsets.all(6.0),
               child: InkWell(
                 onTap: () {
+                  //homePageWelfare.setHomePageWelfare(true);
+
+                  //showWelfareNotification();
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -267,6 +282,17 @@ class _HomeState extends State<Home> {
                         savedSafeIndex = 0;
                         homePageAsk.setHomePageAsk(false);
                       });
+                    }),
+              if (homePageWelfare.shouldGoWelfare)
+                FlatButton(
+                    child: Lottie.asset('assets/lottie/alert.json'),
+                    onPressed: () {
+                      Navigator.push(
+                        globalContext,
+                        MaterialPageRoute(
+                          builder: (context) => WelfareCheck(),
+                        ),
+                      );
                     }),
               IconButton(
                   icon: Icon(Icons.settings, size: 35),

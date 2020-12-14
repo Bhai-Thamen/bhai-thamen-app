@@ -71,6 +71,7 @@ Map<String, String> english = {
   'sms-sent': 'SMS Sent',
   'sms-failed': 'SMS Failed',
   'recording': 'Recording',
+  'welfare': 'Welfare Check',
   'typeOfIncident': 'Incident type',
   'Violence': 'Violence',
   'Harassment': 'Harassment',
@@ -182,6 +183,10 @@ Map<String, String> english = {
   'askDeletePost2': 'Do you want to delete this post?',
   'locationSharingStatusOff': 'Location Sharing OFF',
   'locationSharingStatusOn': 'Location Sharing ON',
+  'welfareCheckTitle': 'Welfare Check',
+  'welfareCheckSubTitle': 'We noticed you might need help.',
+  'welfareCheckQ1': 'Do you need help right now?',
+  'welfareCheckQ2': 'Do you need to report an incident?',
 };
 
 Map<String, String> bangla = {
@@ -259,6 +264,7 @@ Map<String, String> bangla = {
   'Harassment': 'হয়রানি',
   'Sexual Violence': 'যৌন সহিংসতা',
   'recording': 'রেকর্ডিং',
+  'welfare': 'Welfare Check',
   'secretInstructions':
       'নিচে একটি চিত্র নির্বাচন করুন আপনার গোপন স্ক্রিন হিসাবে ব্যবহার করতে',
   'useDefault': 'ডিফল্ট ব্যবহার করুন',
@@ -371,7 +377,12 @@ Map<String, String> bangla = {
   'locationSharingStatusOn': 'Location Sharing ON',
 
   'askDeletePost1': 'DELETE POST',
-  'askDeletePost2': 'Do you want to delete this post?'
+  'askDeletePost2': 'Do you want to delete this post?',
+
+  'welfareCheckTitle': 'Welfare Check',
+  'welfareCheckSubTitle': 'We noticed you might need help.',
+  'welfareCheckQ1': 'Do you need help right now?',
+  'welfareCheckQ2': 'Do you need to report an incident?',
 };
 
 Map<String, Map<String, String>> languages = {

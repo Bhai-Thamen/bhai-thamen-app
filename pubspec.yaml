@@ -76,6 +76,8 @@ dependencies:
   geodesy: ^0.3.2
   cached_network_image: ^2.4.1
   image_gallery_grid_fb: ^1.0.1
+  toggle_switch: ^0.1.8
+  font_awesome_flutter: ^8.10.1
 
   flutter:
     sdk: flutter

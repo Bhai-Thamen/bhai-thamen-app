@@ -1,9 +1,12 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:bhaithamen/data/event.dart';
 import 'package:bhaithamen/data/incident_report.dart';
 import 'package:bhaithamen/data/userData.dart';
+import 'package:bhaithamen/main.dart';
 import 'package:bhaithamen/utilities/analytics_service.dart';
+import 'package:bhaithamen/utilities/auto_page_navigation.dart';
 import 'package:bhaithamen/utilities/fb_test.dart';
 import 'package:bhaithamen/utilities/language_data.dart';
 import 'package:bhaithamen/utilities/variables.dart';
@@ -15,12 +18,54 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart'
     as bg;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:provider/provider.dart';
 
 DateTime today;
 
 Function reportFormClear;
 
 final analyticsHelper = AnalyticsService();
+
+AutoHomePageWelfareSelect homePageWelfareInstance;
+
+showWelfareNotification() async {
+  homePageWelfareInstance =
+      Provider.of<AutoHomePageWelfareSelect>(globalContext);
+  homePageWelfareInstance.setHomePageWelfare(true);
+
+  String title = 'Bhai Thamen Check';
+  String body = 'Do you need help?';
+  String pay_load = 'none';
+
+  Future.delayed(const Duration(seconds: 2), () async {
+    final Int64List vibrationPattern = Int64List(4);
+    vibrationPattern[0] = 0;
+    vibrationPattern[1] = 1000;
+    vibrationPattern[2] = 5000;
+    vibrationPattern[3] = 2000;
+
+    const int insistentFlag = 13;
+
+    var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+        'myid', 'mychannel', 'mydesc',
+        importance: Importance.max,
+        priority: Priority.max,
+        additionalFlags: Int32List.fromList(<int>[insistentFlag, 26]),
+        vibrationPattern: vibrationPattern,
+        enableLights: true,
+        color: Colors.red,
+        ledColor: Colors.blue,
+        ledOnMs: 1000,
+        ledOffMs: 500);
+    var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+    var platformChannelSpecifics = new NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin
+        .show(0, title, body, platformChannelSpecifics, payload: pay_load);
+  });
+}
 
 DateTime getDate() {
   DateTime getToday = new DateTime.now();
@@ -81,6 +126,8 @@ getCurrentPosition(String type, String category) async {
 sendEvent(String type, String category) async {
   if (!testModeToggle) {
     getCurrentPosition(type, category);
+
+    if (type != 'welfare') showWelfareNotification();
   }
 }
 

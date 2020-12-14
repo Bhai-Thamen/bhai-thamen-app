@@ -214,6 +214,7 @@ String lastGeoEvent = 'non';
 
 bool savedShouldGoAsk = false;
 bool savedShouldGoMap = false;
+bool savedShouldGoWelfare = false;
 int savedSafeIndex = 0;
 
 bool pinNeeded = false;
