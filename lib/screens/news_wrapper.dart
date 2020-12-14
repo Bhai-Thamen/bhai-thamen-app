@@ -17,6 +17,7 @@ import 'package:bhaithamen/utilities/auth.dart';
 import 'package:bhaithamen/utilities/language_data.dart';
 import 'package:bhaithamen/utilities/report_event.dart';
 import 'package:bhaithamen/utilities/variables.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
@@ -70,7 +71,6 @@ class _NewsWrapperState extends State<NewsWrapper> {
   initState() {
     super.initState();
     getCurrentUserInfo();
-    print('MPI ' + multiPickedImages.length.toString());
     canCompose = true;
   }
 
@@ -344,7 +344,6 @@ class _NewsWrapperState extends State<NewsWrapper> {
   }
 
   FutureOr onGoBack(dynamic value) {
-    print(value);
     setState(() {
       doShow();
     });
@@ -411,7 +410,23 @@ class _NewsWrapperState extends State<NewsWrapper> {
                     child: profilePic == 'default'
                         ? Image.asset('assets/images/defaultAvatar.png',
                             height: 100, width: 100)
-                        : Image.network(profilePic, height: 70, width: 70),
+                        : CachedNetworkImage(
+                            height: 70,
+                            width: 70,
+                            imageUrl: profilePic,
+                            progressIndicatorBuilder:
+                                (context, url, downloadProgress) => SizedBox(
+                              height: 100,
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                    value: downloadProgress.progress),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
+                          ),
+
+                    //Image.network(profilePic, height: 70, width: 70),
                   ),
                 ),
                 Padding(
@@ -425,13 +440,15 @@ class _NewsWrapperState extends State<NewsWrapper> {
           CustomListTile(
               languages[selectedLanguage[languageIndex]]['sideMenu1'],
               FontAwesomeIcons.newspaper,
-              NewsWrapper(user, observer, analytics)),
+              NewsWrapper(user, observer, analytics),
+              true),
           CustomListTile(
               languages[selectedLanguage[languageIndex]]['sideMenu2'],
               FontAwesomeIcons.hardHat,
-              Home(user, observer, analytics)),
+              Home(user, observer, analytics),
+              false),
           CustomListTile(languages[selectedLanguage[languageIndex]]['settings'],
-              FontAwesomeIcons.cog, SettingsWrapper()),
+              FontAwesomeIcons.cog, SettingsWrapper(), false),
         ])),
         body: Column(
           children: [

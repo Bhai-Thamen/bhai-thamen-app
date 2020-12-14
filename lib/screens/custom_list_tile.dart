@@ -7,8 +7,9 @@ class CustomListTile extends StatelessWidget {
   final String title;
   final IconData theIcon;
   final StatefulWidget navigateTo;
+  final bool ignoreLink;
 
-  CustomListTile(this.title, this.theIcon, this.navigateTo);
+  CustomListTile(this.title, this.theIcon, this.navigateTo, this.ignoreLink);
 
   @override
   Widget build(BuildContext context) {
@@ -22,12 +23,14 @@ class CustomListTile extends StatelessWidget {
             splashColor: Colors.blueAccent,
             onTap: () {
               Navigator.of(context).pop();
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => navigateTo,
-                ),
-              );
+              if (!ignoreLink) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => navigateTo,
+                  ),
+                );
+              }
             },
             child: Container(
               height: 40,

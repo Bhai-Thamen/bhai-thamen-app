@@ -56,8 +56,6 @@ class _UserNewsPageState extends State<UserNewsPage> {
   String getPubDate(DateTime date) {
     //DateTime getToday =  new DateTime.now();  //DateTime(2020, 10, 13);
 
-    print(date);
-
     String returnDate;
 
     String year = formatDate(date, [yyyy]);
@@ -65,11 +63,6 @@ class _UserNewsPageState extends State<UserNewsPage> {
     String fullMonth = formatDate(date, [MM]);
     String day = formatDate(date, [dd]);
     String hour = formatDate(date, [HH, ':', nn]);
-    //String min = formatDate(date, []);
-
-    //today = DateTime(year, month, day);
-
-    //print('today is ' + today.toString());
 
     returnDate = day +
         ' ' +
@@ -131,11 +124,7 @@ class _UserNewsPageState extends State<UserNewsPage> {
   }
 
   Future getUserLocation() async {
-    print('IN GET LOC');
-
     myLocationData = await location.getLocation();
-
-    print('IN GET LOC 2');
 
     GeoPoint loc;
 
@@ -153,7 +142,6 @@ class _UserNewsPageState extends State<UserNewsPage> {
   }
 
   sortByDistance() async {
-    print('SORTUNG BY DISTANCE');
     var geoMyLocation = await getUserLocation();
 
     double lat = geoMyLocation.latitude;
@@ -303,8 +291,6 @@ class _UserNewsPageState extends State<UserNewsPage> {
         newsList.sort((a, b) => b.popularity.compareTo(a.popularity));
       }
     }
-
-    print('ANNNNNNNNNN ' + newsList.length.toString());
 
     return newsList.length == 0
         ? Center(child: CircularProgressIndicator())

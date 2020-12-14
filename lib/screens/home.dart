@@ -18,6 +18,7 @@ import 'package:bhaithamen/utilities/language_data.dart';
 import 'package:bhaithamen/utilities/push_notification.dart';
 import 'package:bhaithamen/utilities/report_event.dart';
 import 'package:bhaithamen/utilities/variables.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
@@ -344,7 +345,21 @@ class _HomeState extends State<Home> {
                     child: profilePic == 'default'
                         ? Image.asset('assets/images/defaultAvatar.png',
                             height: 100, width: 100)
-                        : Image.network(profilePic, height: 70, width: 70),
+                        : CachedNetworkImage(
+                            height: 70,
+                            width: 70,
+                            imageUrl: profilePic,
+                            progressIndicatorBuilder:
+                                (context, url, downloadProgress) => SizedBox(
+                              height: 100,
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                    value: downloadProgress.progress),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
+                          ),
                   ),
                 ),
                 Padding(
@@ -358,13 +373,15 @@ class _HomeState extends State<Home> {
           CustomListTile(
               languages[selectedLanguage[languageIndex]]['sideMenu1'],
               FontAwesomeIcons.newspaper,
-              NewsWrapper(widget.user, observer, analytics)),
+              NewsWrapper(widget.user, observer, analytics),
+              false),
           CustomListTile(
               languages[selectedLanguage[languageIndex]]['sideMenu2'],
               FontAwesomeIcons.hardHat,
-              Home(widget.user, observer, analytics)),
+              Home(widget.user, observer, analytics),
+              true),
           CustomListTile(languages[selectedLanguage[languageIndex]]['settings'],
-              FontAwesomeIcons.cog, SettingsWrapper()),
+              FontAwesomeIcons.cog, SettingsWrapper(), false),
         ])),
 
         body: pageOptions[homePageIndex],
