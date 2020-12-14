@@ -3,20 +3,29 @@ import 'dart:io';
 
 import 'package:bhaithamen/data/alerts_feed.dart';
 import 'package:bhaithamen/data/news_feed.dart';
+import 'package:bhaithamen/data/user.dart';
+import 'package:bhaithamen/data/userData.dart';
 import 'package:bhaithamen/data/user_news_feed.dart';
 import 'package:bhaithamen/screens/alerts_news.dart';
+import 'package:bhaithamen/screens/custom_list_tile.dart';
+import 'package:bhaithamen/screens/home.dart';
 import 'package:bhaithamen/screens/multi_picker.dart';
 import 'package:bhaithamen/screens/news_news.dart';
+import 'package:bhaithamen/screens/settings_wrapper.dart';
 import 'package:bhaithamen/screens/user_news.dart';
 import 'package:bhaithamen/utilities/auth.dart';
 import 'package:bhaithamen/utilities/language_data.dart';
 import 'package:bhaithamen/utilities/report_event.dart';
 import 'package:bhaithamen/utilities/variables.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fbAuth;
+
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'package:provider/provider.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
@@ -26,11 +35,23 @@ flutLoc.Location location = new flutLoc.Location();
 flutLoc.LocationData myLocationData;
 
 class NewsWrapper extends StatefulWidget {
+  final User user;
+  final FirebaseAnalyticsObserver observer;
+  final FirebaseAnalytics analytics;
+
+  NewsWrapper(this.user, this.observer, this.analytics);
   @override
-  _NewsWrapperState createState() => _NewsWrapperState();
+  _NewsWrapperState createState() =>
+      _NewsWrapperState(user, observer, analytics);
 }
 
 class _NewsWrapperState extends State<NewsWrapper> {
+  _NewsWrapperState(this.user, this.observer, this.analytics);
+
+  final FirebaseAnalyticsObserver observer;
+  final FirebaseAnalytics analytics;
+  final User user;
+
   String uid;
   TextEditingController myNews = TextEditingController();
   File _imageFile;
@@ -54,7 +75,7 @@ class _NewsWrapperState extends State<NewsWrapper> {
   }
 
   getCurrentUserInfo() async {
-    var firebaseuser = FirebaseAuth.instance.currentUser;
+    var firebaseuser = fbAuth.FirebaseAuth.instance.currentUser;
     DocumentSnapshot userDoc = await userCollection.doc(firebaseuser.uid).get();
     setState(() {
       uid = firebaseuser.uid;
@@ -341,6 +362,7 @@ class _NewsWrapperState extends State<NewsWrapper> {
 
     return MultiProvider(
       providers: [
+        StreamProvider<UserData>.value(value: AuthService(uid: uid).userData),
         StreamProvider<List<NewsFeed>>.value(
             value: AuthService(uid: uid).getNews),
         StreamProvider<List<UserNewsFeed>>.value(
@@ -373,6 +395,44 @@ class _NewsWrapperState extends State<NewsWrapper> {
                   ),
           ],
         ),
+        drawer: Drawer(
+            child: ListView(children: [
+          DrawerHeader(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    colors: <Color>[Colors.blue[700], Colors.blue[200]])),
+            child: Container(
+                child: Column(
+              children: [
+                Material(
+                  borderRadius: BorderRadius.all(Radius.circular(120.0)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: profilePic == 'default'
+                        ? Image.asset('assets/images/defaultAvatar.png',
+                            height: 100, width: 100)
+                        : Image.network(profilePic, height: 70, width: 70),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(2, 8, 2, 2),
+                  child: Text(userName,
+                      style: myStyle(20, Colors.white, FontWeight.w300)),
+                ),
+              ],
+            )),
+          ),
+          CustomListTile(
+              languages[selectedLanguage[languageIndex]]['sideMenu1'],
+              FontAwesomeIcons.newspaper,
+              NewsWrapper(user, observer, analytics)),
+          CustomListTile(
+              languages[selectedLanguage[languageIndex]]['sideMenu2'],
+              FontAwesomeIcons.hardHat,
+              Home(user, observer, analytics)),
+          CustomListTile(languages[selectedLanguage[languageIndex]]['settings'],
+              FontAwesomeIcons.cog, SettingsWrapper()),
+        ])),
         body: Column(
           children: [
             newsPageOptions[newsPageIndex],

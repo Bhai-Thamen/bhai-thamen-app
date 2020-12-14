@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bhaithamen/data/user.dart';
 import 'package:bhaithamen/data/userData.dart';
 import 'package:bhaithamen/screens/countdown_screen.dart';
+import 'package:bhaithamen/screens/custom_list_tile.dart';
 import 'package:bhaithamen/screens/map_wrapper.dart';
 import 'package:bhaithamen/screens/news.dart';
 import 'package:bhaithamen/screens/news_wrapper.dart';
@@ -17,15 +18,16 @@ import 'package:bhaithamen/utilities/language_data.dart';
 import 'package:bhaithamen/utilities/push_notification.dart';
 import 'package:bhaithamen/utilities/report_event.dart';
 import 'package:bhaithamen/utilities/variables.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-
-import '../main.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fbAuth;
 
 class Home extends StatefulWidget {
   final User user;
@@ -48,7 +50,12 @@ class _HomeState extends State<Home> {
 
   final GlobalKey<ScaffoldState> _scaffoldKeyHome = GlobalKey<ScaffoldState>();
 
+  AutoHomePageWelfareSelect homePageWelfare;
+
   User theUser;
+
+  String userName = '';
+  String profilePic = '';
 
   Future<void> _testSetAnalyticsCollectionEnabled() async {
     await analytics.setAnalyticsCollectionEnabled(false);
@@ -65,9 +72,19 @@ class _HomeState extends State<Home> {
     super.initState();
     theUser = widget.user;
     checkPerm();
+    getCurrentUserInfo();
     _testSetAnalyticsCollectionEnabled();
 
     analyticsHelper.sendAnalyticsEvent('Home View');
+  }
+
+  getCurrentUserInfo() async {
+    var firebaseuser = fbAuth.FirebaseAuth.instance.currentUser;
+    DocumentSnapshot userDoc = await userCollection.doc(firebaseuser.uid).get();
+    setState(() {
+      userName = userDoc['username'];
+      profilePic = userDoc['profilepic'];
+    });
   }
 
   checkPerm() async {
@@ -185,13 +202,13 @@ class _HomeState extends State<Home> {
     //CountPlug(),
     //AskMe()
     CountDown(),
-    NewsWrapper(),
   ];
 
   AnimationController _animationController;
   bool iconPlaying = false;
 
   FutureOr onGoBack(dynamic value) {
+    getCurrentUserInfo();
     setState(() {});
   }
 
@@ -200,18 +217,33 @@ class _HomeState extends State<Home> {
     Navigator.push(context, route).then(onGoBack);
   }
 
-  void testNoti() {
-    print('GOT NOTI');
+  void navigateWelfare() {
+    Route route = MaterialPageRoute(builder: (context) => WelfareCheck());
+    Navigator.push(context, route).then(onGoBack);
+  }
+
+  afterBuild(context) {
+    if (showWelfare) {
+      if (!homePageWelfare.shouldGoWelfare) {
+        homePageWelfare.setHomePageWelfare(true);
+        print('SHHHHHHH ' + showWelfare.toString());
+      }
+    } else {
+      if (homePageWelfare.shouldGoWelfare) {
+        homePageWelfare.setHomePageWelfare(false);
+        print('SHHHHHHH ' + showWelfare.toString());
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => afterBuild(context));
     final AutoHomePageMapSelect homePageMap =
         Provider.of<AutoHomePageMapSelect>(context);
     final AutoHomePageAskSelect homePageAsk =
         Provider.of<AutoHomePageAskSelect>(context);
-    final AutoHomePageWelfareSelect homePageWelfare =
-        Provider.of<AutoHomePageWelfareSelect>(context);
+    homePageWelfare = Provider.of<AutoHomePageWelfareSelect>(context);
     final SafePageIndex safePageIndex = Provider.of<SafePageIndex>(context);
 
     print('home user ' + widget.user.uid);
@@ -226,30 +258,28 @@ class _HomeState extends State<Home> {
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
-            leading: Padding(
-              padding: const EdgeInsets.all(6.0),
-              child: InkWell(
-                onTap: () {
-                  //homePageWelfare.setHomePageWelfare(true);
-
-                  //showWelfareNotification();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => NewsWrapper(),
-                    ),
-                  );
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                        image: AssetImage('assets/images/handStop.png'),
-                        fit: BoxFit.fitHeight),
-                  ),
-                ),
-              ),
-            ),
+            // leading: Padding(
+            //   padding: const EdgeInsets.all(6.0),
+            //   child: InkWell(
+            //     onTap: () {
+            //       //showWelfareNotification();
+            //       // Navigator.push(
+            //       //   context,
+            //       //   MaterialPageRoute(
+            //       //     builder: (context) => NewsWrapper(),
+            //       //   ),
+            //       // );
+            //     },
+            //     child: Container(
+            //       decoration: BoxDecoration(
+            //         shape: BoxShape.circle,
+            //         image: DecorationImage(
+            //             image: AssetImage('assets/images/handStop.png'),
+            //             fit: BoxFit.fitHeight),
+            //       ),
+            //     ),
+            //   ),
+            // ),
             centerTitle: true,
             title: testModeToggle
                 ? Text(languages[selectedLanguage[languageIndex]]['testOn'],
@@ -287,21 +317,55 @@ class _HomeState extends State<Home> {
                 FlatButton(
                     child: Lottie.asset('assets/lottie/alert.json'),
                     onPressed: () {
-                      Navigator.push(
-                        globalContext,
-                        MaterialPageRoute(
-                          builder: (context) => WelfareCheck(),
-                        ),
-                      );
+                      navigateWelfare();
                     }),
-              IconButton(
-                  icon: Icon(Icons.settings, size: 35),
-                  onPressed: () {
-                    navigateSettings();
-                  }),
+              // IconButton(
+              //     icon: Icon(Icons.settings, size: 35),
+              //     onPressed: () {
+              //       navigateSettings();
+              //     }),
             ]),
         key: _scaffoldKeyHome,
         //will show the widget (page) depending on which button was pressed
+
+        drawer: Drawer(
+            child: ListView(children: [
+          DrawerHeader(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    colors: <Color>[Colors.blue[700], Colors.blue[200]])),
+            child: Container(
+                child: Column(
+              children: [
+                Material(
+                  borderRadius: BorderRadius.all(Radius.circular(120.0)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: profilePic == 'default'
+                        ? Image.asset('assets/images/defaultAvatar.png',
+                            height: 100, width: 100)
+                        : Image.network(profilePic, height: 70, width: 70),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(2, 8, 2, 2),
+                  child: Text(userName,
+                      style: myStyle(20, Colors.white, FontWeight.w300)),
+                ),
+              ],
+            )),
+          ),
+          CustomListTile(
+              languages[selectedLanguage[languageIndex]]['sideMenu1'],
+              FontAwesomeIcons.newspaper,
+              NewsWrapper(widget.user, observer, analytics)),
+          CustomListTile(
+              languages[selectedLanguage[languageIndex]]['sideMenu2'],
+              FontAwesomeIcons.hardHat,
+              Home(widget.user, observer, analytics)),
+          CustomListTile(languages[selectedLanguage[languageIndex]]['settings'],
+              FontAwesomeIcons.cog, SettingsWrapper()),
+        ])),
 
         body: pageOptions[homePageIndex],
 
@@ -338,11 +402,6 @@ class _HomeState extends State<Home> {
                     ? Icon(Icons.timer_rounded, size: 26)
                     : Icon(Icons.timer_outlined, size: 22),
                 label: languages[selectedLanguage[languageIndex]]['reminder']),
-            BottomNavigationBarItem(
-                icon: homePageIndex == 3
-                    ? Icon(Icons.new_releases_rounded, size: 26)
-                    : Icon(Icons.new_releases_outlined, size: 22),
-                label: languages[selectedLanguage[languageIndex]]['news']),
           ],
         ),
       ),

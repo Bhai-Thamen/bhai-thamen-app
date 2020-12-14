@@ -175,9 +175,9 @@ Map<String, String> english = {
   'info': 'Info',
   'warn': 'Alert',
   'community': 'Community',
-  'proximity': 'prox',
-  'popular': 'popular',
-  'recent': 'recent',
+  'proximity': 'Distance',
+  'popular': 'Popular',
+  'recent': 'Recent',
   'myposts': 'My Posts',
   'askDeletePost1': 'DELETE POST',
   'askDeletePost2': 'Do you want to delete this post?',
@@ -187,6 +187,10 @@ Map<String, String> english = {
   'welfareCheckSubTitle': 'We noticed you might need help.',
   'welfareCheckQ1': 'Do you need help right now?',
   'welfareCheckQ2': 'Do you need to report an incident?',
+  'notificationTitle': 'Bhai Thamen Welfare Check',
+  'notificationBody': 'Do you need help right now?',
+  'sideMenu1': 'News & Alerts',
+  'sideMenu2': 'Personal Safety',
 };
 
 Map<String, String> bangla = {
@@ -369,20 +373,26 @@ Map<String, String> bangla = {
   'info': 'তথ্য',
   'warn': 'সতর্কতা',
   'community': 'সম্প্রদায়',
-  'proximity': 'prox',
-  'popular': 'popular',
-  'recent': 'recent',
-  'myposts': 'My Posts',
-  'locationSharingStatusOff': 'Location Sharing OFF',
-  'locationSharingStatusOn': 'Location Sharing ON',
+  'proximity': 'Distance BD',
+  'popular': 'Popular BD',
+  'recent': 'Recent BD',
+  'myposts': 'My Posts BD',
+  'locationSharingStatusOff': 'Location Sharing OFF BD',
+  'locationSharingStatusOn': 'Location Sharing ON BD',
 
-  'askDeletePost1': 'DELETE POST',
-  'askDeletePost2': 'Do you want to delete this post?',
+  'askDeletePost1': 'DELETE POST BD',
+  'askDeletePost2': 'Do you want to delete this post? BD',
 
-  'welfareCheckTitle': 'Welfare Check',
-  'welfareCheckSubTitle': 'We noticed you might need help.',
-  'welfareCheckQ1': 'Do you need help right now?',
-  'welfareCheckQ2': 'Do you need to report an incident?',
+  'welfareCheckTitle': 'Welfare Check BD',
+  'welfareCheckSubTitle': 'We noticed you might need help. BD',
+  'welfareCheckQ1': 'Do you need help right now? BD',
+  'welfareCheckQ2': 'Do you need to report an incident? BD',
+
+  'notificationTitle': 'Bhai Thamen Welfare Check BD',
+  'notificationBody': 'Do you need help right now? BD',
+
+  'sideMenu1': 'News & Alerts BD',
+  'sideMenu2': 'Personal Safety BD',
 };
 
 Map<String, Map<String, String>> languages = {

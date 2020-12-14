@@ -28,6 +28,7 @@ class _WelfareCheckState extends State<WelfareCheck> {
   void initState() {
     super.initState();
     getCurrentUserInfo();
+    showWelfare = false;
   }
 
   getCurrentUserInfo() async {
@@ -52,6 +53,8 @@ class _WelfareCheckState extends State<WelfareCheck> {
         homePageAsk.setHomePageAsk(false);
         Navigator.of(context).pop();
       });
+    } else {
+      Navigator.of(context).pop();
     }
   }
 

@@ -51,7 +51,6 @@ class _UserNewsPageState extends State<UserNewsPage> {
     super.initState();
     getCurrentUserUID();
     //sendResearchReport('News_Section');
-    sortByDistance();
   }
 
   String getPubDate(DateTime date) {
@@ -88,9 +87,11 @@ class _UserNewsPageState extends State<UserNewsPage> {
 
     DocumentSnapshot userInfo =
         await userCollection.doc(firebaseuser.uid).get();
-    setState(() {
-      uid = firebaseuser.uid;
-    });
+
+    //setState(() {
+    uid = firebaseuser.uid;
+    sortByTime();
+    //});
   }
 
   likePost(String docId) async {
@@ -130,7 +131,11 @@ class _UserNewsPageState extends State<UserNewsPage> {
   }
 
   Future getUserLocation() async {
+    print('IN GET LOC');
+
     myLocationData = await location.getLocation();
+
+    print('IN GET LOC 2');
 
     GeoPoint loc;
 
@@ -148,8 +153,9 @@ class _UserNewsPageState extends State<UserNewsPage> {
   }
 
   sortByDistance() async {
+    print('SORTUNG BY DISTANCE');
     var geoMyLocation = await getUserLocation();
-    //print(geoMyLocation.longitude);
+
     double lat = geoMyLocation.latitude;
     double lng = geoMyLocation.longitude;
     setState(() {
@@ -297,6 +303,9 @@ class _UserNewsPageState extends State<UserNewsPage> {
         newsList.sort((a, b) => b.popularity.compareTo(a.popularity));
       }
     }
+
+    print('ANNNNNNNNNN ' + newsList.length.toString());
+
     return newsList.length == 0
         ? Center(child: CircularProgressIndicator())
         : Column(
@@ -314,51 +323,6 @@ class _UserNewsPageState extends State<UserNewsPage> {
                       borderColor: Colors.white,
                       children: <Widget>[
                         isSelected[0]
-                            ? Container(
-                                width:
-                                    (MediaQuery.of(context).size.width - 12) /
-                                        3,
-                                child: new Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    new Icon(
-                                      Icons.directions_walk,
-                                      size: 16.0,
-                                      color: Colors.white,
-                                    ),
-                                    new SizedBox(
-                                      width: 4.0,
-                                    ),
-                                    new Text(
-                                      languages[selectedLanguage[languageIndex]]
-                                          ['proximity'],
-                                      style: TextStyle(color: Colors.white),
-                                    )
-                                  ],
-                                ))
-                            : Container(
-                                width:
-                                    (MediaQuery.of(context).size.width - 12) /
-                                        3,
-                                child: new Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    new Icon(
-                                      Icons.directions_walk,
-                                      size: 16.0,
-                                      color: Colors.black,
-                                    ),
-                                    new SizedBox(
-                                      width: 4.0,
-                                    ),
-                                    new Text(
-                                      languages[selectedLanguage[languageIndex]]
-                                          ['proximity'],
-                                      style: TextStyle(color: Colors.black),
-                                    )
-                                  ],
-                                )),
-                        isSelected[1]
                             ? Container(
                                 width:
                                     (MediaQuery.of(context).size.width - 12) /
@@ -401,6 +365,51 @@ class _UserNewsPageState extends State<UserNewsPage> {
                                                 selectedLanguage[languageIndex]]
                                             ['recent'],
                                         style: TextStyle(color: Colors.black))
+                                  ],
+                                )),
+                        isSelected[1]
+                            ? Container(
+                                width:
+                                    (MediaQuery.of(context).size.width - 12) /
+                                        3,
+                                child: new Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    new Icon(
+                                      Icons.directions_walk,
+                                      size: 16.0,
+                                      color: Colors.white,
+                                    ),
+                                    new SizedBox(
+                                      width: 4.0,
+                                    ),
+                                    new Text(
+                                      languages[selectedLanguage[languageIndex]]
+                                          ['proximity'],
+                                      style: TextStyle(color: Colors.white),
+                                    )
+                                  ],
+                                ))
+                            : Container(
+                                width:
+                                    (MediaQuery.of(context).size.width - 12) /
+                                        3,
+                                child: new Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    new Icon(
+                                      Icons.directions_walk,
+                                      size: 16.0,
+                                      color: Colors.black,
+                                    ),
+                                    new SizedBox(
+                                      width: 4.0,
+                                    ),
+                                    new Text(
+                                      languages[selectedLanguage[languageIndex]]
+                                          ['proximity'],
+                                      style: TextStyle(color: Colors.black),
+                                    )
                                   ],
                                 )),
                         isSelected[2]
@@ -463,12 +472,12 @@ class _UserNewsPageState extends State<UserNewsPage> {
                             }
                           }
                           if (selectedIndex == 0) {
-                            sortByDistance();
+                            sortByTime();
                             //sendResearchReport('News_Section');
                           }
                           if (selectedIndex == 1) {
                             //sendResearchReport('Info_Section');
-                            sortByTime();
+                            sortByDistance();
                           }
                           if (selectedIndex == 2) {
                             sortByPopularity();

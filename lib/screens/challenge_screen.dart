@@ -477,6 +477,7 @@ class _ChallengeScreenState extends State<ChallengeScreen>
 
                             print('START');
                             sendEvent('alarm', 'alarm');
+
                             loadLocal();
                             //player.play();
 

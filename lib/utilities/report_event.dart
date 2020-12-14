@@ -27,25 +27,22 @@ Function reportFormClear;
 
 final analyticsHelper = AnalyticsService();
 
-AutoHomePageWelfareSelect homePageWelfareInstance;
-
 showWelfareNotification() async {
-  homePageWelfareInstance =
-      Provider.of<AutoHomePageWelfareSelect>(globalContext);
-  homePageWelfareInstance.setHomePageWelfare(true);
-
-  String title = 'Bhai Thamen Check';
-  String body = 'Do you need help?';
+  String title =
+      languages[selectedLanguage[languageIndex]]['notificationTitle'];
+  String body = languages[selectedLanguage[languageIndex]]['notificationBody'];
   String pay_load = 'none';
 
-  Future.delayed(const Duration(seconds: 2), () async {
+  Future.delayed(const Duration(seconds: 10), () async {
+    showWelfare = true;
+
     final Int64List vibrationPattern = Int64List(4);
     vibrationPattern[0] = 0;
     vibrationPattern[1] = 1000;
     vibrationPattern[2] = 5000;
     vibrationPattern[3] = 2000;
 
-    const int insistentFlag = 13;
+    const int insistentFlag = 4;
 
     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
         'myid', 'mychannel', 'mydesc',
