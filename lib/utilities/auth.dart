@@ -235,6 +235,7 @@ class AuthService {
           category: doc.data()['category'],
           details: doc.data()['details'],
           rating: doc.data()['rating'],
+          raters: doc.data()['raters'],
           price: doc.data()['price'],
           location: doc.data()['location'],
           images: doc.data()['images']);

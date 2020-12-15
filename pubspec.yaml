@@ -46,6 +46,7 @@ dependencies:
   share: ^0.6.5+4
   keyboard_avoider: ^0.1.2
   keyboard_utils: ^1.2.4
+  smooth_star_rating: 1.1.1
 
   latlong: ^0.6.1
   #flutter_screen_lock: ^1.2.4

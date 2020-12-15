@@ -25,6 +25,7 @@ import 'package:firebase_auth/firebase_auth.dart' as fbAuth;
 import 'package:lottie/lottie.dart' as lot;
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:smooth_star_rating/smooth_star_rating.dart';
 
 class MapPlaces extends StatefulWidget {
   final User user;
@@ -43,6 +44,7 @@ class _MapPlacesState extends State<MapPlaces> {
   final _mapPlacesKey = GlobalKey<TopModalSheetState>();
 
   AutoHomePageWelfareSelect homePageWelfare;
+  AutoPlaceCategorySelect autoSetCategory;
 
   final FirebaseAnalyticsObserver observer;
   final FirebaseAnalytics analytics;
@@ -52,6 +54,13 @@ class _MapPlacesState extends State<MapPlaces> {
   String userPhone = '';
   String userEmail = '';
   String profilePic = '';
+
+  bool ratingMode = true;
+  double gotRating = 0;
+  double originalRating = 0;
+  bool firstTimeRating = true;
+
+  Map<dynamic, dynamic> safeplacesRatings = Map<dynamic, dynamic>();
 
   BitmapDescriptor toiletMarker;
   BitmapDescriptor pharmacyMarker;
@@ -97,6 +106,7 @@ class _MapPlacesState extends State<MapPlaces> {
       userPhone = userDoc['userPhone'];
       userEmail = userDoc['email'];
       profilePic = userDoc['profilepic'];
+      safeplacesRatings = userDoc['safeplaceRatings'];
     });
   }
 
@@ -186,8 +196,50 @@ class _MapPlacesState extends State<MapPlaces> {
     }
   }
 
-  doShow(String name, String details, int rating, String price, LatLng location,
-      images) {
+  calculateRating(
+      newRating, originalRating, rating, raters, docId, firstTouch) async {
+    if (firstTimeRating) {
+      raters++;
+      rating = (rating + newRating);
+    } else {
+      if (firstTouch) rating -= originalRating;
+      rating = (rating + newRating);
+
+      gotRating = newRating;
+    }
+
+    print('NEW R ' + rating.toString());
+
+    userCollection.doc(uid).set({
+      "safeplaceRatings": {docId: newRating}
+    }, SetOptions(merge: true));
+
+    safePlaceCollection
+        .doc('dhaka')
+        .collection(autoSetCategory.shouldGoCategory)
+        .doc(docId)
+        .update({'rating': rating, 'raters': raters});
+  }
+
+  doShow(String name, String details, int rating, int raters, String price,
+      LatLng location, images, docId) async {
+    DocumentSnapshot userDoc = await userCollection.doc(uid).get();
+    setState(() {
+      safeplacesRatings = userDoc['safeplaceRatings'];
+    });
+
+    if (safeplacesRatings.containsKey(docId)) {
+      gotRating = safeplacesRatings[docId];
+      originalRating = safeplacesRatings[docId];
+      firstTimeRating = false;
+    } else {
+      gotRating = 0;
+      originalRating = 0;
+      firstTimeRating = true;
+    }
+
+    bool firstTouch = true;
+
     showModalBottomSheet(
         isScrollControlled: true,
         context: context,
@@ -231,13 +283,31 @@ class _MapPlacesState extends State<MapPlaces> {
                     ],
                   ),
                   SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      for (var i = 0; i < rating; i++)
-                        Icon(Icons.star, size: 50, color: Colors.yellow[700])
-                    ],
-                  ),
+                  ratingMode
+                      ? SmoothStarRating(
+                          allowHalfRating: false,
+                          onRated: (v) {
+                            calculateRating(v, originalRating, rating, raters,
+                                docId, firstTouch);
+                            if (firstTouch) firstTouch = false;
+                          },
+                          starCount: 5,
+                          rating: gotRating,
+                          size: 40.0,
+                          isReadOnly: false,
+                          filledIconData: Icons.star,
+                          halfFilledIconData: Icons.star_half,
+                          color: Colors.green,
+                          borderColor: Colors.green,
+                          spacing: 0.0)
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            for (var i = 0; i < rating; i++)
+                              Icon(Icons.star,
+                                  size: 50, color: Colors.yellow[700])
+                          ],
+                        ),
                 ]),
               ),
             );
@@ -254,8 +324,7 @@ class _MapPlacesState extends State<MapPlaces> {
     homePageWelfare = Provider.of<AutoHomePageWelfareSelect>(context);
     Provider.of<AutoHomePageAskSelect>(context);
 
-    final AutoPlaceCategorySelect autoSetCategory =
-        Provider.of<AutoPlaceCategorySelect>(context);
+    autoSetCategory = Provider.of<AutoPlaceCategorySelect>(context);
 
     final SafePageIndex safePageIndex = Provider.of<SafePageIndex>(context);
 
@@ -278,9 +347,11 @@ class _MapPlacesState extends State<MapPlaces> {
                     safePlaces[i].name,
                     safePlaces[i].details,
                     safePlaces[i].rating,
+                    safePlaces[i].raters,
                     safePlaces[i].price,
                     latLng,
-                    safePlaces[i].images);
+                    safePlaces[i].images,
+                    safePlaces[i].docId);
               },
               icon: myMarkers[safePlaces[i].category],
               infoWindow: InfoWindow(

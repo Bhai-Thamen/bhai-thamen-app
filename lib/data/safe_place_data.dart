@@ -9,6 +9,7 @@ class SafePlace {
   final List<dynamic> images;
   final GeoPoint location;
   final int rating;
+  final int raters;
   final DateTime time;
 
   SafePlace(
@@ -17,6 +18,7 @@ class SafePlace {
       this.category,
       this.time,
       this.rating,
+      this.raters,
       this.price,
       this.images,
       this.name,
@@ -32,6 +34,7 @@ class SafePlace {
       'price': price,
       'location': location,
       'rating': rating,
+      'raters': raters,
       'docId': docId
     };
   }
@@ -47,6 +50,7 @@ class SafePlace {
         images: map['images'],
         details: map['details'],
         rating: map['rating'],
+        raters: map['raters'],
         price: map['price'],
         docId: map['docId']);
   }
