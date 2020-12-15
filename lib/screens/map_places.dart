@@ -24,6 +24,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fbAuth;
 import 'package:lottie/lottie.dart' as lot;
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MapPlaces extends StatefulWidget {
   final User user;
@@ -164,6 +165,86 @@ class _MapPlacesState extends State<MapPlaces> {
     myMarkers['pharmacy'] = pharmacyMarker;
   }
 
+  Future<void> openMap(LatLng location) async {
+    var geoMyLocation = await getUserLocation();
+
+    double lat = geoMyLocation.latitude;
+    double long = geoMyLocation.longitude;
+
+    double latitude = location.latitude;
+    double longitude = location.longitude;
+
+    var url =
+        'https://www.google.com/maps/dir/?api=1&origin=$lat,$long&destination=$latitude,$longitude';
+
+    String googleUrl = url;
+    //'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+    if (await canLaunch(googleUrl)) {
+      await launch(googleUrl);
+    } else {
+      throw 'Could not open the map.';
+    }
+  }
+
+  doShow(String name, String details, int rating, String price, LatLng location,
+      images) {
+    showModalBottomSheet(
+        isScrollControlled: true,
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(builder: (BuildContext context,
+              StateSetter setModalState /*You can rename this!*/) {
+            return SizedBox(
+              height: MediaQuery.of(context).size.height / 2,
+              child: Center(
+                child: Column(children: [
+                  SizedBox(height: 8),
+                  Text(name, style: myStyle(22, Colors.black, FontWeight.bold)),
+                  SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      images.length > 0
+                          ? SizedBox(
+                              height: 120, child: Image.network(images[0]))
+                          : Container(),
+                      SizedBox(width: 15),
+                      images.length > 1
+                          ? SizedBox(
+                              height: 120, child: Image.network(images[1]))
+                          : Container(),
+                      SizedBox(height: 22),
+                    ],
+                  ),
+                  Text(details, style: myStyle(18)),
+                  SizedBox(height: 26),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text('Price: ' + price, style: myStyle(18)),
+                      InkWell(
+                          onTap: () {
+                            openMap(location);
+                          },
+                          child: Text('Get Directions',
+                              style: myStyle(18, Colors.blue)))
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      for (var i = 0; i < rating; i++)
+                        Icon(Icons.star, size: 50, color: Colors.yellow[700])
+                    ],
+                  ),
+                ]),
+              ),
+            );
+          });
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     final AutoHomePageMapSelect homePageMap =
@@ -192,6 +273,15 @@ class _MapPlacesState extends State<MapPlaces> {
           _markers.add(Marker(
               markerId: MarkerId(safePlaces[i].docId),
               position: latLng,
+              onTap: () {
+                doShow(
+                    safePlaces[i].name,
+                    safePlaces[i].details,
+                    safePlaces[i].rating,
+                    safePlaces[i].price,
+                    latLng,
+                    safePlaces[i].images);
+              },
               icon: myMarkers[safePlaces[i].category],
               infoWindow: InfoWindow(
                   title: safePlaces[i].name,
