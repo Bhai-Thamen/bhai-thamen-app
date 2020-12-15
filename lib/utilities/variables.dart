@@ -252,6 +252,8 @@ bool canCompose = false;
 
 bool myNewsOnly = true;
 
+String safePlaceCategory = 'medical';
+
 List<Asset> multiPickedImages = List<Asset>();
 
 CollectionReference userCollection =
@@ -270,6 +272,9 @@ CollectionReference zoneCollection =
     FirebaseFirestore.instance.collection('zone');
 CollectionReference timerCollection =
     FirebaseFirestore.instance.collection('timer');
+
+CollectionReference safePlaceCollection =
+    FirebaseFirestore.instance.collection('safeplaces');
 
 CollectionReference requestedDeleteAccount =
     FirebaseFirestore.instance.collection('requestedDeleteAccount');

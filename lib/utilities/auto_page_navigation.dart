@@ -54,6 +54,24 @@ class AutoHomePageWelfareSelect extends ChangeNotifier {
   }
 }
 
+class AutoPlaceCategorySelect extends ChangeNotifier {
+  AutoPlaceCategorySelect(this._gotoCategory);
+
+  String _gotoCategory = '';
+
+  String get shouldGoCategory => _gotoCategory;
+
+  set goToCategory(String val) {
+    _gotoCategory = val;
+    notifyListeners();
+  }
+
+  setCategory(String val) async {
+    _gotoCategory = val;
+    notifyListeners();
+  }
+}
+
 class PinRequired extends ChangeNotifier {
   PinRequired(this._gotoChange);
 

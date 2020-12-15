@@ -191,6 +191,7 @@ Map<String, String> english = {
   'notificationBody': 'Do you need help right now?',
   'sideMenu1': 'News & Alerts',
   'sideMenu2': 'Personal Safety',
+  'sideMenu3': 'Safe Places',
 };
 
 Map<String, String> bangla = {
@@ -393,6 +394,7 @@ Map<String, String> bangla = {
 
   'sideMenu1': 'News & Alerts BD',
   'sideMenu2': 'Personal Safety BD',
+  'sideMenu3': 'Safe Places BD',
 };
 
 Map<String, Map<String, String>> languages = {

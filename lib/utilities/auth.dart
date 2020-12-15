@@ -4,6 +4,7 @@ import 'package:bhaithamen/data/event_date.dart';
 import 'package:bhaithamen/data/incident_date.dart';
 import 'package:bhaithamen/data/incident_report.dart';
 import 'package:bhaithamen/data/news_feed.dart';
+import 'package:bhaithamen/data/safe_place_data.dart';
 import 'package:bhaithamen/data/user.dart';
 import 'package:bhaithamen/data/userData.dart';
 import 'package:bhaithamen/data/user_news_feed.dart';
@@ -17,8 +18,10 @@ import 'package:firebase_core/firebase_core.dart';
 
 class AuthService {
   final String uid;
+  final String place;
+  final String category;
 
-  AuthService({this.uid});
+  AuthService({this.uid, this.place, this.category});
 
   final auth.FirebaseAuth _auth = auth.FirebaseAuth.instance;
   //final GoogleSignIn _google = GoogleSignIn();
@@ -223,6 +226,21 @@ class AuthService {
     }).toList();
   }
 
+  static List<SafePlace> _safePlaceFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.docs.map((doc) {
+      return SafePlace(
+          time: doc.data()['time'].toDate(),
+          docId: doc.id,
+          name: doc.data()['name'],
+          category: doc.data()['category'],
+          details: doc.data()['details'],
+          rating: doc.data()['rating'],
+          price: doc.data()['price'],
+          location: doc.data()['location'],
+          images: doc.data()['images']);
+    }).toList();
+  }
+
   Future<void> signOut() async {
     var user = auth.FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -249,6 +267,14 @@ class AuthService {
 
   Stream<List<UserNewsFeed>> get getUserNews {
     return userNewsCollection.snapshots().map(_userNewsFromSnapshot);
+  }
+
+  Stream<List<SafePlace>> get getSafePlaces {
+    return safePlaceCollection
+        .doc(place)
+        .collection(category)
+        .snapshots()
+        .map(_safePlaceFromSnapshot);
   }
 
   Stream<List<EventDay>> get getEvents {

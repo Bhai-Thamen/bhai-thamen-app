@@ -4,6 +4,8 @@ import 'package:bhaithamen/data/user.dart';
 import 'package:bhaithamen/data/userData.dart';
 import 'package:bhaithamen/screens/countdown_screen.dart';
 import 'package:bhaithamen/screens/custom_list_tile.dart';
+import 'package:bhaithamen/screens/map_places.dart';
+import 'package:bhaithamen/screens/map_places_wrapper.dart';
 import 'package:bhaithamen/screens/map_wrapper.dart';
 import 'package:bhaithamen/screens/news.dart';
 import 'package:bhaithamen/screens/news_wrapper.dart';
@@ -380,6 +382,11 @@ class _HomeState extends State<Home> {
               FontAwesomeIcons.hardHat,
               Home(widget.user, observer, analytics),
               true),
+          CustomListTile(
+              languages[selectedLanguage[languageIndex]]['sideMenu3'],
+              FontAwesomeIcons.map,
+              MapPlacesWrapper(widget.user, observer, analytics),
+              false),
           CustomListTile(languages[selectedLanguage[languageIndex]]['settings'],
               FontAwesomeIcons.cog, SettingsWrapper(), false),
         ])),

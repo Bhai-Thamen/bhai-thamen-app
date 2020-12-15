@@ -261,6 +261,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             value: AutoHomePageAskSelect(myVars.savedShouldGoAsk)),
         ChangeNotifierProvider<AutoHomePageWelfareSelect>.value(
             value: AutoHomePageWelfareSelect(myVars.savedShouldGoWelfare)),
+
+        ChangeNotifierProvider<AutoPlaceCategorySelect>.value(
+            value: AutoPlaceCategorySelect(myVars.safePlaceCategory)),
         //ChangeNotifierProvider<PinRequired>.value(value : PinRequired(pinNeeded)),
         ChangeNotifierProvider<SafePageIndex>.value(
             value: SafePageIndex(myVars.savedSafeIndex)),

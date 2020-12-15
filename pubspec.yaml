@@ -78,6 +78,8 @@ dependencies:
   image_gallery_grid_fb: ^1.0.1
   toggle_switch: ^0.1.8
   font_awesome_flutter: ^8.10.1
+  backdrop: ^0.4.7
+  top_modal_sheet: ^1.0.0+1
 
   flutter:
     sdk: flutter

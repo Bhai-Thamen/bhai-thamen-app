@@ -9,6 +9,8 @@ import 'package:bhaithamen/data/user_news_feed.dart';
 import 'package:bhaithamen/screens/alerts_news.dart';
 import 'package:bhaithamen/screens/custom_list_tile.dart';
 import 'package:bhaithamen/screens/home.dart';
+import 'package:bhaithamen/screens/map_places.dart';
+import 'package:bhaithamen/screens/map_places_wrapper.dart';
 import 'package:bhaithamen/screens/multi_picker.dart';
 import 'package:bhaithamen/screens/news_news.dart';
 import 'package:bhaithamen/screens/settings_wrapper.dart';
@@ -446,6 +448,11 @@ class _NewsWrapperState extends State<NewsWrapper> {
               languages[selectedLanguage[languageIndex]]['sideMenu2'],
               FontAwesomeIcons.hardHat,
               Home(user, observer, analytics),
+              false),
+          CustomListTile(
+              languages[selectedLanguage[languageIndex]]['sideMenu3'],
+              FontAwesomeIcons.map,
+              MapPlacesWrapper(user, observer, analytics),
               false),
           CustomListTile(languages[selectedLanguage[languageIndex]]['settings'],
               FontAwesomeIcons.cog, SettingsWrapper(), false),
