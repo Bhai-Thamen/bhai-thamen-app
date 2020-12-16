@@ -56,9 +56,12 @@ class _MapPlacesState extends State<MapPlaces> {
   String profilePic = '';
 
   bool ratingMode = true;
-  double gotRating = 0;
-  double originalRating = 0;
+
   bool firstTimeRating = true;
+
+  int rating;
+  int raters;
+  int lastRating = 0;
 
   Map<dynamic, dynamic> safeplacesRatings = Map<dynamic, dynamic>();
 
@@ -196,16 +199,23 @@ class _MapPlacesState extends State<MapPlaces> {
     }
   }
 
-  calculateRating(
-      newRating, originalRating, rating, raters, docId, firstTouch) async {
+  calculateRating(received, docId, firstTouch) async {
+    int newRating = received.toInt();
+
+    print(newRating.runtimeType);
+    print(rating.runtimeType);
+    print(lastRating.runtimeType);
+
     if (firstTimeRating) {
+      firstTimeRating = false;
       raters++;
       rating = (rating + newRating);
     } else {
-      if (firstTouch) rating -= originalRating;
-      rating = (rating + newRating);
+      rating = (rating + newRating) - lastRating;
 
-      gotRating = newRating;
+      lastRating = newRating;
+
+      //gotRating = newRating; update modalState
     }
 
     print('NEW R ' + rating.toString());
@@ -221,24 +231,32 @@ class _MapPlacesState extends State<MapPlaces> {
         .update({'rating': rating, 'raters': raters});
   }
 
-  doShow(String name, String details, int rating, int raters, String price,
-      LatLng location, images, docId) async {
+  doShow(String name, String details, String price, LatLng location, images,
+      docId) async {
     DocumentSnapshot userDoc = await userCollection.doc(uid).get();
+    DocumentSnapshot placeDoc = await safePlaceCollection
+        .doc('dhaka')
+        .collection(autoSetCategory.shouldGoCategory)
+        .doc(docId)
+        .get();
+
+    raters = placeDoc['raters'];
+    rating = placeDoc['rating'];
+
     setState(() {
       safeplacesRatings = userDoc['safeplaceRatings'];
     });
 
     if (safeplacesRatings.containsKey(docId)) {
-      gotRating = safeplacesRatings[docId];
-      originalRating = safeplacesRatings[docId];
+      lastRating = safeplacesRatings[docId];
       firstTimeRating = false;
     } else {
-      gotRating = 0;
-      originalRating = 0;
       firstTimeRating = true;
     }
 
     bool firstTouch = true;
+    int tempRating = lastRating;
+    double displayRating = tempRating.toDouble();
 
     showModalBottomSheet(
         isScrollControlled: true,
@@ -287,12 +305,11 @@ class _MapPlacesState extends State<MapPlaces> {
                       ? SmoothStarRating(
                           allowHalfRating: false,
                           onRated: (v) {
-                            calculateRating(v, originalRating, rating, raters,
-                                docId, firstTouch);
+                            calculateRating(v, docId, firstTouch);
                             if (firstTouch) firstTouch = false;
                           },
                           starCount: 5,
-                          rating: gotRating,
+                          rating: displayRating,
                           size: 40.0,
                           isReadOnly: false,
                           filledIconData: Icons.star,
@@ -346,8 +363,6 @@ class _MapPlacesState extends State<MapPlaces> {
                 doShow(
                     safePlaces[i].name,
                     safePlaces[i].details,
-                    safePlaces[i].rating,
-                    safePlaces[i].raters,
                     safePlaces[i].price,
                     latLng,
                     safePlaces[i].images,
