@@ -63,6 +63,8 @@ class _MapPlacesState extends State<MapPlaces> {
   int raters;
   int lastRating = 0;
 
+  double overallRating;
+
   Map<dynamic, dynamic> safeplacesRatings = Map<dynamic, dynamic>();
 
   BitmapDescriptor toiletMarker;
@@ -199,7 +201,7 @@ class _MapPlacesState extends State<MapPlaces> {
     }
   }
 
-  calculateRating(received, docId, firstTouch) async {
+  calculateRating(received, docId) async {
     int newRating = received.toInt();
 
     print(newRating.runtimeType);
@@ -231,9 +233,73 @@ class _MapPlacesState extends State<MapPlaces> {
         .update({'rating': rating, 'raters': raters});
   }
 
+  Future<bool> _onGiveRating(docId) async {
+    DocumentSnapshot userDoc = await userCollection.doc(uid).get();
+
+    safeplacesRatings = userDoc['safeplaceRatings'];
+
+    if (safeplacesRatings.containsKey(docId)) {
+      lastRating = safeplacesRatings[docId];
+      firstTimeRating = false;
+    } else {
+      lastRating = 0;
+      firstTimeRating = true;
+    }
+
+    int tempRating = lastRating;
+    double displayRating = tempRating.toDouble();
+
+    return showDialog(
+        context: context,
+        builder: (context) => new AlertDialog(
+            title: new Text(
+                languages[selectedLanguage[languageIndex]]['giveRating']),
+            content: Container(
+                height: 150,
+                child: Center(
+                      child: Column(
+                        children: [
+                          SmoothStarRating(
+                              allowHalfRating: false,
+                              onRated: (v) {
+                                calculateRating(v, docId);
+                              },
+                              starCount: 5,
+                              rating: displayRating,
+                              size: 40.0,
+                              isReadOnly: false,
+                              filledIconData: Icons.star,
+                              halfFilledIconData: Icons.star_half,
+                              color: Colors.green,
+                              borderColor: Colors.green,
+                              spacing: 0.0),
+                          SizedBox(height: 30),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Spacer(),
+                              FlatButton(
+                                child: Text(
+                                    languages[selectedLanguage[languageIndex]]
+                                        ['ok'],
+                                    style: myStyle(22, Colors.white)),
+                                textColor: Colors.white,
+                                color: Colors.green,
+                                onPressed: () async {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              Spacer(),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ) ??
+                    false)));
+  }
+
   doShow(String name, String details, String price, LatLng location, images,
       docId) async {
-    DocumentSnapshot userDoc = await userCollection.doc(uid).get();
     DocumentSnapshot placeDoc = await safePlaceCollection
         .doc('dhaka')
         .collection(autoSetCategory.shouldGoCategory)
@@ -243,20 +309,7 @@ class _MapPlacesState extends State<MapPlaces> {
     raters = placeDoc['raters'];
     rating = placeDoc['rating'];
 
-    setState(() {
-      safeplacesRatings = userDoc['safeplaceRatings'];
-    });
-
-    if (safeplacesRatings.containsKey(docId)) {
-      lastRating = safeplacesRatings[docId];
-      firstTimeRating = false;
-    } else {
-      firstTimeRating = true;
-    }
-
-    bool firstTouch = true;
-    int tempRating = lastRating;
-    double displayRating = tempRating.toDouble();
+    overallRating = rating / raters;
 
     showModalBottomSheet(
         isScrollControlled: true,
@@ -301,30 +354,23 @@ class _MapPlacesState extends State<MapPlaces> {
                     ],
                   ),
                   SizedBox(height: 16),
-                  ratingMode
-                      ? SmoothStarRating(
-                          allowHalfRating: false,
-                          onRated: (v) {
-                            calculateRating(v, docId, firstTouch);
-                            if (firstTouch) firstTouch = false;
-                          },
-                          starCount: 5,
-                          rating: displayRating,
-                          size: 40.0,
-                          isReadOnly: false,
-                          filledIconData: Icons.star,
-                          halfFilledIconData: Icons.star_half,
-                          color: Colors.green,
-                          borderColor: Colors.green,
-                          spacing: 0.0)
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            for (var i = 0; i < rating; i++)
-                              Icon(Icons.star,
-                                  size: 50, color: Colors.yellow[700])
-                          ],
-                        ),
+                  GestureDetector(
+                    onTap: () {
+                      _onGiveRating(docId);
+                    },
+                    child: SmoothStarRating(
+                        allowHalfRating: true,
+                        onRated: (v) {},
+                        starCount: 5,
+                        rating: overallRating,
+                        size: 40.0,
+                        isReadOnly: true,
+                        filledIconData: Icons.star,
+                        halfFilledIconData: Icons.star_half,
+                        color: Colors.green,
+                        borderColor: Colors.green,
+                        spacing: 0.0),
+                  )
                 ]),
               ),
             );
