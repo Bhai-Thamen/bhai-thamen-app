@@ -255,6 +255,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     return MultiProvider(
       providers: [
         StreamProvider<User>.value(value: AuthService().user),
+        ChangeNotifierProvider<AutoRating>.value(value: AutoRating(0)),
         ChangeNotifierProvider<AutoHomePageMapSelect>.value(
             value: AutoHomePageMapSelect(myVars.savedShouldGoMap)),
         ChangeNotifierProvider<AutoHomePageAskSelect>.value(

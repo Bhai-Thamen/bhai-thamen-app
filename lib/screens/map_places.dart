@@ -45,6 +45,9 @@ class _MapPlacesState extends State<MapPlaces> {
 
   AutoHomePageWelfareSelect homePageWelfare;
   AutoPlaceCategorySelect autoSetCategory;
+  AutoRating autoSetRating;
+
+  Function modalUpdate;
 
   final FirebaseAnalyticsObserver observer;
   final FirebaseAnalytics analytics;
@@ -58,6 +61,8 @@ class _MapPlacesState extends State<MapPlaces> {
   bool ratingMode = true;
 
   bool firstTimeRating = true;
+
+  StateSetter setTheModalState;
 
   int rating;
   int raters;
@@ -226,11 +231,16 @@ class _MapPlacesState extends State<MapPlaces> {
       "safeplaceRatings": {docId: newRating}
     }, SetOptions(merge: true));
 
-    safePlaceCollection
+    await safePlaceCollection
         .doc('dhaka')
         .collection(autoSetCategory.shouldGoCategory)
         .doc(docId)
         .update({'rating': rating, 'raters': raters});
+
+    overallRating = rating / raters;
+    setTheModalState(() {
+      autoSetRating.setRating(overallRating);
+    });
   }
 
   Future<bool> _onGiveRating(docId) async {
@@ -286,6 +296,9 @@ class _MapPlacesState extends State<MapPlaces> {
                                 textColor: Colors.white,
                                 color: Colors.green,
                                 onPressed: () async {
+                                  setTheModalState(() {
+                                    autoSetRating.setRating(overallRating);
+                                  });
                                   Navigator.pop(context);
                                 },
                               ),
@@ -311,12 +324,15 @@ class _MapPlacesState extends State<MapPlaces> {
 
     overallRating = rating / raters;
 
+    autoSetRating.setRating(overallRating);
+
     showModalBottomSheet(
         isScrollControlled: true,
         context: context,
         builder: (context) {
           return StatefulBuilder(builder: (BuildContext context,
               StateSetter setModalState /*You can rename this!*/) {
+            this.setTheModalState = setModalState;
             return SizedBox(
               height: MediaQuery.of(context).size.height / 2,
               child: Center(
@@ -362,7 +378,7 @@ class _MapPlacesState extends State<MapPlaces> {
                         allowHalfRating: true,
                         onRated: (v) {},
                         starCount: 5,
-                        rating: overallRating,
+                        rating: autoSetRating.shouldGoRating,
                         size: 40.0,
                         isReadOnly: true,
                         filledIconData: Icons.star,
@@ -387,6 +403,8 @@ class _MapPlacesState extends State<MapPlaces> {
     homePageWelfare = Provider.of<AutoHomePageWelfareSelect>(context);
     Provider.of<AutoHomePageAskSelect>(context);
 
+    autoSetRating = Provider.of<AutoRating>(context);
+
     autoSetCategory = Provider.of<AutoPlaceCategorySelect>(context);
 
     final SafePageIndex safePageIndex = Provider.of<SafePageIndex>(context);
@@ -401,6 +419,8 @@ class _MapPlacesState extends State<MapPlaces> {
           double lat = safePlaces[i].location.latitude;
           double lng = safePlaces[i].location.longitude;
           LatLng latLng = new LatLng(lat, lng);
+
+          double rate = safePlaces[i].rating / safePlaces[i].raters;
 
           _markers.add(Marker(
               markerId: MarkerId(safePlaces[i].docId),
@@ -417,7 +437,7 @@ class _MapPlacesState extends State<MapPlaces> {
               icon: myMarkers[safePlaces[i].category],
               infoWindow: InfoWindow(
                   title: safePlaces[i].name,
-                  snippet: safePlaces[i].rating.toString() + ' out of 5')));
+                  snippet: rate.toStringAsFixed(1) + ' out of 5')));
 
           //print('MARKER' + safePlaces[i].name);
         }

@@ -72,6 +72,24 @@ class AutoPlaceCategorySelect extends ChangeNotifier {
   }
 }
 
+class AutoRating extends ChangeNotifier {
+  AutoRating(this._gotoRating);
+
+  double _gotoRating = 0;
+
+  double get shouldGoRating => _gotoRating;
+
+  set goToRating(double val) {
+    _gotoRating = val;
+    notifyListeners();
+  }
+
+  setRating(double val) async {
+    _gotoRating = val;
+    notifyListeners();
+  }
+}
+
 class PinRequired extends ChangeNotifier {
   PinRequired(this._gotoChange);
 
