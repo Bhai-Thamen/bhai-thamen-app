@@ -283,6 +283,9 @@ CollectionReference requestedDeleteData =
 CollectionReference feedbackCollection =
     FirebaseFirestore.instance.collection('appFeedback');
 
+CollectionReference reportedCollection =
+    FirebaseFirestore.instance.collection('reportedPlaces');
+
 CollectionReference newsCollection =
     FirebaseFirestore.instance.collection('newsfeed');
 

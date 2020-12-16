@@ -193,6 +193,20 @@ Map<String, String> english = {
   'sideMenu2': 'Personal Safety',
   'sideMenu3': 'Safe Places',
   'giveRating': 'Rate these details',
+  'toilets': 'toilets',
+  'medical': 'medical',
+  'shopping': 'shopping',
+  'leisure': 'leisure',
+  'food': 'food',
+  'beauty': 'beauty',
+  'reportScreenTitle': 'Report this location',
+  'reportDescription':
+      'Please only submit a report if you think this is a serious issue that will affect other users of Bhai Thamen',
+  'reportReason1': 'Could not use toilet',
+  'reportReason2': 'Inappropriate behaviour',
+  'reportReason3': 'Other',
+  'reportButton': 'Send Report',
+  'reportPlaceSubmitted': 'Thank you. We have received your report.'
 };
 
 Map<String, String> bangla = {
@@ -397,6 +411,21 @@ Map<String, String> bangla = {
   'sideMenu2': 'Personal Safety BD',
   'sideMenu3': 'Safe Places BD',
   'giveRating': 'Rate these details BD',
+  'toilets': 'টয়লেট',
+  'medical': 'চিকিৎসা',
+  'shopping': 'কেনাকাটা',
+  'leisure': 'অবসর',
+  'food': 'খাদ্য',
+  'beauty': 'সৌন্দর্য',
+
+  'reportScreenTitle': 'Report this location BD',
+  'reportDescription':
+      'Please only submit a report if you think this is a serious issue that will affect other users of Bhai Thamen BD',
+  'reportReason1': 'Could not use toilet BD',
+  'reportReason2': 'Inappropriate behaviour BD',
+  'reportReason3': 'Other BD',
+  'reportButton': 'Send Report BD',
+  'reportPlaceSubmitted': 'Thank you. We have received your report. BD'
 };
 
 Map<String, Map<String, String>> languages = {

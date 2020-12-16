@@ -8,6 +8,7 @@ import 'package:bhaithamen/screens/map_places_wrapper.dart';
 import 'package:bhaithamen/screens/map_top_menu.dart';
 import 'package:bhaithamen/screens/map_wrapper.dart';
 import 'package:bhaithamen/screens/news_wrapper.dart';
+import 'package:bhaithamen/screens/report_place.dart';
 import 'package:bhaithamen/screens/settings_wrapper.dart';
 import 'package:bhaithamen/screens/welfare_check.dart';
 import 'package:bhaithamen/utilities/auto_page_navigation.dart';
@@ -19,6 +20,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:share/share.dart';
 import 'package:top_modal_sheet/top_modal_sheet.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fbAuth;
@@ -311,6 +313,23 @@ class _MapPlacesState extends State<MapPlaces> {
                     false)));
   }
 
+  _sharePlace(name, details, location) async {
+    double latitude = location.latitude;
+    double longitude = location.longitude;
+
+    String msg = userName +
+        ' thought you might like to see this...' +
+        '\n\n' +
+        name +
+        '\n\n' +
+        details +
+        '\n\n' +
+        'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude' +
+        '\n\n' +
+        'Shared from Bhai Thamen https://bhaithamen.com';
+    Share.share(msg, subject: 'Bhai Thamen');
+  }
+
   doShow(String name, String details, String price, LatLng location, images,
       docId) async {
     DocumentSnapshot placeDoc = await safePlaceCollection
@@ -335,59 +354,125 @@ class _MapPlacesState extends State<MapPlaces> {
             this.setTheModalState = setModalState;
             return SizedBox(
               height: MediaQuery.of(context).size.height / 2,
-              child: Center(
-                child: Column(children: [
-                  SizedBox(height: 8),
-                  Text(name, style: myStyle(22, Colors.black, FontWeight.bold)),
-                  SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      images.length > 0
-                          ? SizedBox(
-                              height: 120, child: Image.network(images[0]))
-                          : Container(),
-                      SizedBox(width: 15),
-                      images.length > 1
-                          ? SizedBox(
-                              height: 120, child: Image.network(images[1]))
-                          : Container(),
-                      SizedBox(height: 22),
-                    ],
-                  ),
-                  Text(details, style: myStyle(18)),
-                  SizedBox(height: 26),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text('Price: ' + price, style: myStyle(18)),
-                      InkWell(
-                          onTap: () {
-                            openMap(location);
-                          },
-                          child: Text('Get Directions',
-                              style: myStyle(18, Colors.blue)))
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  GestureDetector(
-                    onTap: () {
-                      _onGiveRating(docId);
-                    },
-                    child: SmoothStarRating(
-                        allowHalfRating: true,
-                        onRated: (v) {},
-                        starCount: 5,
-                        rating: autoSetRating.shouldGoRating,
-                        size: 40.0,
-                        isReadOnly: true,
-                        filledIconData: Icons.star,
-                        halfFilledIconData: Icons.star_half,
-                        color: Colors.green,
-                        borderColor: Colors.green,
-                        spacing: 0.0),
-                  )
-                ]),
+              child: SingleChildScrollView(
+                child: Center(
+                  child: Column(children: [
+                    SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(name,
+                            style: myStyle(22, Colors.black, FontWeight.bold)),
+                        SizedBox(width: 12),
+                        GestureDetector(
+                            onTap: () {
+                              _sharePlace(name, details, location);
+                            },
+                            child: Icon(Icons.share))
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        images.length > 0
+                            ? SizedBox(
+                                height: 120, child: Image.network(images[0]))
+                            : Container(),
+                        SizedBox(width: 15),
+                        images.length > 1
+                            ? SizedBox(
+                                height: 120, child: Image.network(images[1]))
+                            : Container(),
+                        SizedBox(height: 22),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(22.0, 10, 10, 10),
+                      child: Text(details, style: myStyle(18)),
+                    ),
+                    SizedBox(height: 26),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text('Price: ' + price, style: myStyle(18)),
+                        InkWell(
+                            onTap: () {
+                              openMap(location);
+                            },
+                            child: Text('Get Directions',
+                                style: myStyle(18, Colors.blue)))
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    GestureDetector(
+                      onTap: () {
+                        _onGiveRating(docId);
+                      },
+                      child: SmoothStarRating(
+                          allowHalfRating: true,
+                          onRated: (v) {},
+                          starCount: 5,
+                          rating: autoSetRating.shouldGoRating,
+                          size: 40.0,
+                          isReadOnly: true,
+                          filledIconData: Icons.star,
+                          halfFilledIconData: Icons.star_half,
+                          color: Colors.green,
+                          borderColor: Colors.green,
+                          spacing: 0.0),
+                    ),
+                    SizedBox(height: 15),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                              bottom: BorderSide(color: Colors.grey[400])),
+                        ),
+                        child: InkWell(
+                            splashColor: Colors.blueAccent,
+                            onTap: () {
+                              // Navigator.of(context).pop();
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ReportPlace(
+                                        name,
+                                        location,
+                                        docId,
+                                        autoSetCategory.shouldGoCategory)),
+                              );
+                            },
+                            child: Container(
+                              height: 40,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child:
+                                              Icon(FontAwesomeIcons.pencilAlt)),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child:
+                                            Text('Report', style: myStyle(18)),
+                                      )
+                                    ],
+                                  ),
+                                  Icon(Icons.arrow_right),
+                                ],
+                              ),
+                            )),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                  ]),
+                ),
               ),
             );
           });
@@ -487,7 +572,7 @@ class _MapPlacesState extends State<MapPlaces> {
                     navigateWelfare();
                   }),
             IconButton(
-              icon: Icon(Icons.settings, size: 35),
+              icon: Icon(Icons.arrow_downward, size: 35),
               onPressed: () async {
                 var value = await showTopModalSheet<String>(
                     context: context, child: MapTopMenu());

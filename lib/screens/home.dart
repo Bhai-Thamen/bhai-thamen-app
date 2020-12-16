@@ -66,15 +66,15 @@ class _HomeState extends State<Home> {
     print('setAnalyticsCollectionEnabled succeeded');
   }
 
-  Future<bool> awaitStarted() async {
-    return new Future.delayed(const Duration(seconds: 30), () => true);
-  }
+  // Future<bool> awaitStarted() async {
+  //   return new Future.delayed(const Duration(seconds: 30), () => true);
+  // }
 
   @override
   void initState() {
     super.initState();
     theUser = widget.user;
-    checkPerm();
+    //checkPerm();
     getCurrentUserInfo();
     _testSetAnalyticsCollectionEnabled();
 
@@ -90,108 +90,108 @@ class _HomeState extends State<Home> {
     });
   }
 
-  checkPerm() async {
-    // SMS PERM
-    try {
-      var status = await Permission.sms.status;
-      if (status.isUndetermined || status.isDenied) {
-        // We didn't ask for permission yet.
-        if (await Permission.sms.request().isGranted) {
-          print('sms granted');
-          // Either the permission was already granted before or the user just granted it.
-        }
-      }
-    } on Exception catch (exception) {
-      print(exception.toString());
-      // only executed if error is of type Exception
-    } catch (error) {
-      // executed for errors of all types other than Exception
-    }
+  // checkPerm() async {
+  //   // SMS PERM
+  //   try {
+  //     var status = await Permission.sms.status;
+  //     if (status.isUndetermined || status.isDenied) {
+  //       // We didn't ask for permission yet.
+  //       if (await Permission.sms.request().isGranted) {
+  //         print('sms granted');
+  //         // Either the permission was already granted before or the user just granted it.
+  //       }
+  //     }
+  //   } on Exception catch (exception) {
+  //     print(exception.toString());
+  //     // only executed if error is of type Exception
+  //   } catch (error) {
+  //     // executed for errors of all types other than Exception
+  //   }
 
-    ///
-    /// CAM PERM
-    try {
-      var camStatus = await Permission.camera.status;
-      if (camStatus.isUndetermined || camStatus.isDenied) {
-        // We didn't ask for permission yet.
-        if (await Permission.camera.request().isGranted) {
-          print('cam granted');
-          // Either the permission was already granted before or the user just granted it.
-        }
-      }
-    } on Exception catch (exception) {
-      // only executed if error is of type Exception
-    } catch (error) {
-      // executed for errors of all types other than Exception
-    }
-    ////
-    ///
-    ///phone perm
-    try {
-      var callStatus = await Permission.phone.status;
-      if (callStatus.isUndetermined || callStatus.isDenied) {
-        // We didn't ask for permission yet.
-        if (await Permission.phone.request().isGranted) {
-          print('phone granted');
-          // Either the permission was already granted before or the user just granted it.
-        }
-      }
-    } on Exception catch (exception) {
-      // only executed if error is of type Exception
-    } catch (error) {
-      // executed for errors of all types other than Exception
-    }
+  //   ///
+  //   /// CAM PERM
+  //   try {
+  //     var camStatus = await Permission.camera.status;
+  //     if (camStatus.isUndetermined || camStatus.isDenied) {
+  //       // We didn't ask for permission yet.
+  //       if (await Permission.camera.request().isGranted) {
+  //         print('cam granted');
+  //         // Either the permission was already granted before or the user just granted it.
+  //       }
+  //     }
+  //   } on Exception catch (exception) {
+  //     // only executed if error is of type Exception
+  //   } catch (error) {
+  //     // executed for errors of all types other than Exception
+  //   }
+  //   ////
+  //   ///
+  //   ///phone perm
+  //   try {
+  //     var callStatus = await Permission.phone.status;
+  //     if (callStatus.isUndetermined || callStatus.isDenied) {
+  //       // We didn't ask for permission yet.
+  //       if (await Permission.phone.request().isGranted) {
+  //         print('phone granted');
+  //         // Either the permission was already granted before or the user just granted it.
+  //       }
+  //     }
+  //   } on Exception catch (exception) {
+  //     // only executed if error is of type Exception
+  //   } catch (error) {
+  //     // executed for errors of all types other than Exception
+  //   }
 
-    //mic perm
-    try {
-      var audStatus = await Permission.microphone.status;
-      if (audStatus.isUndetermined || audStatus.isDenied) {
-        // We didn't ask for permission yet.
-        if (await Permission.microphone.request().isGranted) {
-          print('mic granted');
-          // Either the permission was already granted before or the user just granted it.
-        }
-      }
-    } on Exception catch (exception) {
-      // only executed if error is of type Exception
-    } catch (error) {
-      // executed for errors of all types other than Exception
-    }
+  //   //mic perm
+  //   try {
+  //     var audStatus = await Permission.microphone.status;
+  //     if (audStatus.isUndetermined || audStatus.isDenied) {
+  //       // We didn't ask for permission yet.
+  //       if (await Permission.microphone.request().isGranted) {
+  //         print('mic granted');
+  //         // Either the permission was already granted before or the user just granted it.
+  //       }
+  //     }
+  //   } on Exception catch (exception) {
+  //     // only executed if error is of type Exception
+  //   } catch (error) {
+  //     // executed for errors of all types other than Exception
+  //   }
 
-    //store perm
-    try {
-      var storeStatus = await Permission.storage.status;
-      if (storeStatus.isUndetermined || storeStatus.isDenied) {
-        // We didn't ask for permission yet.
-        if (await Permission.storage.request().isGranted) {
-          print('store granted');
-          // Either the permission was already granted before or the user just granted it.
-        }
-      }
-    } on Exception catch (exception) {
-      // only executed if error is of type Exception
-    } catch (error) {
-      // executed for errors of all types other than Exception
-    }
+  //   //store perm
+  //   try {
+  //     var storeStatus = await Permission.storage.status;
+  //     if (storeStatus.isUndetermined || storeStatus.isDenied) {
+  //       // We didn't ask for permission yet.
+  //       if (await Permission.storage.request().isGranted) {
+  //         print('store granted');
+  //         // Either the permission was already granted before or the user just granted it.
+  //       }
+  //     }
+  //   } on Exception catch (exception) {
+  //     // only executed if error is of type Exception
+  //   } catch (error) {
+  //     // executed for errors of all types other than Exception
+  //   }
 
-    //location perm
-    try {
-      var locstatus = await Permission.location.status;
-      if (locstatus.isUndetermined || locstatus.isDenied) {
-        // We didn't ask for permission yet.
-        if (await Permission.location.request().isGranted) {
-          print('location granted');
-          // Either the permission was already granted before or the user just granted it.
-        }
-      }
-    } on Exception catch (exception) {
-      // only executed if error is of type Exception
-    } catch (error) {
-      // executed for errors of all types other than Exception
-    }
+  //   //location perm
+  //   try {
+  //     var locstatus = await Permission.location.status;
+  //     if (locstatus.isUndetermined || locstatus.isDenied) {
+  //       // We didn't ask for permission yet.
+  //       if (await Permission.location.request().isGranted) {
+  //         print('location granted');
+  //         // Either the permission was already granted before or the user just granted it.
+  //       }
+  //     }
+  //   } on Exception catch (exception) {
+  //     // only executed if error is of type Exception
+  //   } catch (error) {
+  //     // executed for errors of all types other than Exception
+  //   }
 
-    appHasStarted = await awaitStarted();
-  }
+  //   appHasStarted = await awaitStarted();
+  // }
   //show tab 1 - this is the middle tab i.e. Safe
 
   // page = 0 means show tab SOS

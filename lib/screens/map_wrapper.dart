@@ -18,26 +18,21 @@ class MapWrapper extends StatefulWidget {
 }
 
 class _MapWrapperState extends State<MapWrapper> {
+  String uid;
 
-String uid;
-
-  initState(){
+  initState() {
     super.initState();
     getCurrentUserUID();
-
-    
   }
 
-  getCurrentUserUID()async{
+  getCurrentUserUID() async {
     var firebaseuser = FirebaseAuth.instance.currentUser;
     setState(() {
       uid = firebaseuser.uid;
     });
-
   }
 
-    FutureOr onGoBack(dynamic value) {
-    
+  FutureOr onGoBack(dynamic value) {
     setState(() {});
   }
 
@@ -46,57 +41,65 @@ String uid;
     Navigator.push(context, route).then(onGoBack);
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-
-  final AutoHomePageMapSelect homePageMap = Provider.of<AutoHomePageMapSelect>(context);
-  final AutoHomePageAskSelect homePageAsk = Provider.of<AutoHomePageAskSelect>(context); 
-  final SafePageIndex safePageIndex = Provider.of<SafePageIndex>(context);
-
+    final AutoHomePageMapSelect homePageMap =
+        Provider.of<AutoHomePageMapSelect>(context);
+    final AutoHomePageAskSelect homePageAsk =
+        Provider.of<AutoHomePageAskSelect>(context);
+    final SafePageIndex safePageIndex = Provider.of<SafePageIndex>(context);
 
     return MultiProvider(
-      providers:[
+      providers: [
         StreamProvider<UserData>.value(value: AuthService(uid: uid).userData),
       ],
-child: Scaffold(
-  appBar: AppBar(
-        centerTitle: true,
-        title: testModeToggle ? Text(languages[selectedLanguage[languageIndex]]['testOn'], style: myStyle(18, Colors.white)): Text(languages[selectedLanguage[languageIndex]]['title'], style: myStyle(18, Colors.white)),  
-        backgroundColor: testModeToggle ? Colors.red : Colors.blue,
-        actions: <Widget>[
-          //if (homePageMap.shouldGoMap) FlatButton(child: Lottie.asset('assets/lottie/alert.json'), onPressed: (){ setState(() {homePageIndex = 1; safePageIndex.setSafePageIndex(0);savedSafeIndex=0;homePageMap.setHomePageMap(false);});}),
-          if (homePageAsk.shouldGoAsk) FlatButton(child: Lottie.asset('assets/lottie/alert.json'), onPressed: (){setState(() {
-            homePageIndex = 2; safePageIndex.setSafePageIndex(0);savedSafeIndex=0;homePageAsk.setHomePageAsk(false);Navigator.pop(context); });}),
-          // if (homePageMap.shouldGoMap)
-          // FlatButton(
-          //   child: Lottie.asset('assets/lottie/alert.json'),
-          //   onPressed: (){ setState(() {
-          //   Navigator.push(
-          //           context,
-          //           MaterialPageRoute(
-          //             builder: (context) => MapWrapper(),
-          //           ),
-          //         );              
-          //     //homePageIndex = 1; safePageIndex.setSafePageIndex(0);savedSafeIndex=0;homePageMap.setHomePageMap(false);
-          //     });
-          //     }) ,         
-          IconButton(icon: Icon(Icons.settings, size:35), onPressed:(){
-            navigateSettings();
-          }
-          ),           
- 
-        ]
+      child: Scaffold(
+        appBar: AppBar(
+            centerTitle: true,
+            title: testModeToggle
+                ? Text(languages[selectedLanguage[languageIndex]]['testOn'],
+                    style: myStyle(18, Colors.white))
+                : Text(languages[selectedLanguage[languageIndex]]['title'],
+                    style: myStyle(18, Colors.white)),
+            backgroundColor: testModeToggle ? Colors.red : Colors.blue,
+            actions: <Widget>[
+              //if (homePageMap.shouldGoMap) FlatButton(child: Lottie.asset('assets/lottie/alert.json'), onPressed: (){ setState(() {homePageIndex = 1; safePageIndex.setSafePageIndex(0);savedSafeIndex=0;homePageMap.setHomePageMap(false);});}),
+              if (homePageAsk.shouldGoAsk)
+                FlatButton(
+                    child: Lottie.asset('assets/lottie/alert.json'),
+                    onPressed: () {
+                      setState(() {
+                        homePageIndex = 2;
+                        safePageIndex.setSafePageIndex(0);
+                        savedSafeIndex = 0;
+                        homePageAsk.setHomePageAsk(false);
+                        Navigator.pop(context);
+                      });
+                    }),
+              // if (homePageMap.shouldGoMap)
+              // FlatButton(
+              //   child: Lottie.asset('assets/lottie/alert.json'),
+              //   onPressed: (){ setState(() {
+              //   Navigator.push(
+              //           context,
+              //           MaterialPageRoute(
+              //             builder: (context) => MapWrapper(),
+              //           ),
+              //         );
+              //     //homePageIndex = 1; safePageIndex.setSafePageIndex(0);savedSafeIndex=0;homePageMap.setHomePageMap(false);
+              //     });
+              //     }) ,
+              IconButton(
+                  icon: Icon(Icons.settings, size: 35),
+                  onPressed: () {
+                    navigateSettings();
+                  }),
+            ]),
+        //key: _scaffoldKeyHome,
+        body: Center(
+          child: Mapping(),
+        ),
       ),
-      //key: _scaffoldKeyHome,
-    body:Center(
-      child: Mapping(),      
-      ),
-    
-    ),
-    
-  );
-    
+    );
   }
 }
