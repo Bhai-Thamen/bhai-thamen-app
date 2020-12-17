@@ -19,6 +19,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:share/share.dart';
 import 'package:top_modal_sheet/top_modal_sheet.dart';
@@ -152,7 +153,7 @@ class _MapPlacesState extends State<MapPlaces> {
 
   void navigateWelfare() {
     Route route = MaterialPageRoute(builder: (context) => WelfareCheck());
-    Navigator.push(context, route).then(onGoBack);
+    Navigator.push(context, route);
   }
 
   afterBuild(context) {
@@ -330,13 +331,38 @@ class _MapPlacesState extends State<MapPlaces> {
     Share.share(msg, subject: 'Bhai Thamen');
   }
 
-  doShow(String name, String details, String price, LatLng location, images,
-      docId) async {
+  Future<void> _onOpen(LinkableElement link) async {
+    if (await canLaunch(link.url)) {
+      await launch(link.url);
+    } else {
+      throw 'Could not launch $link';
+    }
+  }
+
+  _launchCaller(String number) async {
+    var url = "tel:" + number;
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  doShow(String name, String detailsEN, String detailsBN, String price,
+      String phone, LatLng location, images, docId) async {
     DocumentSnapshot placeDoc = await safePlaceCollection
         .doc('dhaka')
         .collection(autoSetCategory.shouldGoCategory)
         .doc(docId)
         .get();
+
+    String details;
+
+    if (languageIndex == 0) {
+      details = detailsEN;
+    } else {
+      details = detailsBN;
+    }
 
     raters = placeDoc['raters'];
     rating = placeDoc['rating'];
@@ -389,18 +415,47 @@ class _MapPlacesState extends State<MapPlaces> {
                     ),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(22.0, 10, 10, 10),
-                      child: Text(details, style: myStyle(18)),
+                      child: Linkify(
+                        onOpen: _onOpen,
+                        text: details,
+                        style: myStyle(18),
+                      ),
                     ),
-                    SizedBox(height: 26),
-                    Row(
+                    SizedBox(height: 16),
+                    Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Text('Price: ' + price, style: myStyle(18)),
+                        phone != ''
+                            ? GestureDetector(
+                                onTap: () {
+                                  _launchCaller(phone);
+                                },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.phone),
+                                    SizedBox(width: 8),
+                                    Text(phone,
+                                        style: myStyle(18, Colors.blue)),
+                                  ],
+                                ))
+                            : Container(),
+                        SizedBox(height: 18),
+                        Text(
+                            languages[selectedLanguage[languageIndex]]
+                                    ['price'] +
+                                ' ' +
+                                languages[selectedLanguage[languageIndex]]
+                                    [price.replaceAll(' ', '').toLowerCase()],
+                            style: myStyle(18)),
+                        SizedBox(height: 18),
                         InkWell(
                             onTap: () {
                               openMap(location);
                             },
-                            child: Text('Get Directions',
+                            child: Text(
+                                languages[selectedLanguage[languageIndex]]
+                                    ['getDirections'],
                                 style: myStyle(18, Colors.blue)))
                       ],
                     ),
@@ -516,8 +571,10 @@ class _MapPlacesState extends State<MapPlaces> {
               onTap: () {
                 doShow(
                     safePlaces[i].name,
-                    safePlaces[i].details,
+                    safePlaces[i].detailsEN,
+                    safePlaces[i].detailsBN,
                     safePlaces[i].price,
+                    safePlaces[i].phone,
                     latLng,
                     safePlaces[i].images,
                     safePlaces[i].docId);
@@ -566,6 +623,12 @@ class _MapPlacesState extends State<MapPlaces> {
                       safePageIndex.setSafePageIndex(0);
                       savedSafeIndex = 0;
                       homePageAsk.setHomePageAsk(false);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                Home(user, observer, analytics)),
+                      );
                     });
                   }),
             if (homePageWelfare.shouldGoWelfare)

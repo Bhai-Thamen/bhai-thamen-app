@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SafePlace {
-  final String details;
+  final String detailsEN;
+  final String detailsBN;
   final String docId;
   final String price;
+  final String phone;
   final String name;
   final String category;
   final List<dynamic> images;
@@ -13,10 +15,12 @@ class SafePlace {
   final DateTime time;
 
   SafePlace(
-      {this.details,
+      {this.detailsEN,
+      this.detailsBN,
       this.location,
       this.category,
       this.time,
+      this.phone,
       this.rating,
       this.raters,
       this.price,
@@ -26,9 +30,11 @@ class SafePlace {
 
   Map<String, dynamic> toMap() {
     return {
-      'details': details,
+      'detailsEN': detailsEN,
+      'detailsBN': detailsBN,
       'time': time,
       'name': name,
+      'phone': phone,
       'category': category,
       'images': images,
       'price': price,
@@ -46,9 +52,11 @@ class SafePlace {
         location: map['location'],
         time: map['time'],
         name: map['name'],
+        phone: map['phone'],
         category: map['category'],
         images: map['images'],
-        details: map['details'],
+        detailsEN: map['detailsEN'],
+        detailsBN: map['detailsBN'],
         rating: map['rating'],
         raters: map['raters'],
         price: map['price'],
