@@ -11,11 +11,14 @@ import 'package:bhaithamen/screens/custom_list_tile.dart';
 import 'package:bhaithamen/screens/home.dart';
 import 'package:bhaithamen/screens/map_places.dart';
 import 'package:bhaithamen/screens/map_places_wrapper.dart';
+import 'package:bhaithamen/screens/map_wrapper.dart';
 import 'package:bhaithamen/screens/multi_picker.dart';
 import 'package:bhaithamen/screens/news_news.dart';
 import 'package:bhaithamen/screens/settings_wrapper.dart';
 import 'package:bhaithamen/screens/user_news.dart';
+import 'package:bhaithamen/screens/welfare_check.dart';
 import 'package:bhaithamen/utilities/auth.dart';
+import 'package:bhaithamen/utilities/auto_page_navigation.dart';
 import 'package:bhaithamen/utilities/language_data.dart';
 import 'package:bhaithamen/utilities/report_event.dart';
 import 'package:bhaithamen/utilities/variables.dart';
@@ -29,6 +32,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:uuid/uuid.dart';
 import 'package:provider/provider.dart';
@@ -55,6 +59,8 @@ class _NewsWrapperState extends State<NewsWrapper> {
   final FirebaseAnalyticsObserver observer;
   final FirebaseAnalytics analytics;
   final User user;
+
+  AutoHomePageWelfareSelect homePageWelfare;
 
   String uid;
   TextEditingController myNews = TextEditingController();
@@ -462,8 +468,35 @@ class _NewsWrapperState extends State<NewsWrapper> {
     Navigator.push(context, route).then(onGoBack);
   }
 
+  afterBuild(context) {
+    if (showWelfare) {
+      if (!homePageWelfare.shouldGoWelfare) {
+        homePageWelfare.setHomePageWelfare(true);
+        print('SHHHHHHH ' + showWelfare.toString());
+      }
+    } else {
+      if (homePageWelfare.shouldGoWelfare) {
+        homePageWelfare.setHomePageWelfare(false);
+        print('SHHHHHHH ' + showWelfare.toString());
+      }
+    }
+  }
+
+  void navigateWelfare() {
+    Route route = MaterialPageRoute(builder: (context) => WelfareCheck());
+    Navigator.push(context, route);
+  }
+
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => afterBuild(context));
+    final AutoHomePageMapSelect homePageMap =
+        Provider.of<AutoHomePageMapSelect>(context);
+    final AutoHomePageAskSelect homePageAsk =
+        Provider.of<AutoHomePageAskSelect>(context);
+    homePageWelfare = Provider.of<AutoHomePageWelfareSelect>(context);
+    final SafePageIndex safePageIndex = Provider.of<SafePageIndex>(context);
+
     thisContext = context;
 
     return MultiProvider(
@@ -480,6 +513,43 @@ class _NewsWrapperState extends State<NewsWrapper> {
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
           actions: <Widget>[
+            if (homePageMap.shouldGoMap)
+              FlatButton(
+                  child: Lottie.asset('assets/lottie/alert.json'),
+                  onPressed: () {
+                    setState(() {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MapWrapper(),
+                        ),
+                      );
+                      //homePageIndex = 1; safePageIndex.setSafePageIndex(0);savedSafeIndex=0;homePageMap.setHomePageMap(false);
+                    });
+                  }),
+            if (homePageAsk.shouldGoAsk)
+              FlatButton(
+                  child: Lottie.asset('assets/lottie/alert.json'),
+                  onPressed: () {
+                    setState(() {
+                      homePageIndex = 2;
+                      safePageIndex.setSafePageIndex(0);
+                      savedSafeIndex = 0;
+                      homePageAsk.setHomePageAsk(false);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                Home(user, observer, analytics)),
+                      );
+                    });
+                  }),
+            if (homePageWelfare.shouldGoWelfare)
+              FlatButton(
+                  child: Lottie.asset('assets/lottie/alert.json'),
+                  onPressed: () {
+                    navigateWelfare();
+                  }),
             !canCompose
                 ? Container()
                 : Padding(

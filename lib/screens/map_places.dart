@@ -459,8 +459,11 @@ class _MapPlacesState extends State<MapPlaces> {
                                               Icon(FontAwesomeIcons.pencilAlt)),
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
-                                        child:
-                                            Text('Report', style: myStyle(18)),
+                                        child: Text(
+                                            languages[selectedLanguage[
+                                                    languageIndex]]
+                                                ['reportPlaceBtn'],
+                                            style: myStyle(18)),
                                       )
                                     ],
                                   ),

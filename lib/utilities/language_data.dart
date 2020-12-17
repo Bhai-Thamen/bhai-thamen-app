@@ -206,7 +206,8 @@ Map<String, String> english = {
   'reportReason2': 'Inappropriate behaviour',
   'reportReason3': 'Other',
   'reportButton': 'Send Report',
-  'reportPlaceSubmitted': 'Thank you. We have received your report.'
+  'reportPlaceSubmitted': 'Thank you. We have received your report.',
+  'reportPlaceBtn': 'Report BD'
 };
 
 Map<String, String> bangla = {
@@ -425,7 +426,8 @@ Map<String, String> bangla = {
   'reportReason2': 'Inappropriate behaviour BD',
   'reportReason3': 'Other BD',
   'reportButton': 'Send Report BD',
-  'reportPlaceSubmitted': 'Thank you. We have received your report. BD'
+  'reportPlaceSubmitted': 'Thank you. We have received your report. BD',
+  'reportPlaceBtn': 'Report BD'
 };
 
 Map<String, Map<String, String>> languages = {
