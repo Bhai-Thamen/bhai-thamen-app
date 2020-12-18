@@ -8,6 +8,7 @@ import 'package:bhaithamen/screens/map_places_wrapper.dart';
 import 'package:bhaithamen/screens/map_top_menu.dart';
 import 'package:bhaithamen/screens/map_wrapper.dart';
 import 'package:bhaithamen/screens/news_wrapper.dart';
+import 'package:bhaithamen/screens/place_full_details.dart';
 import 'package:bhaithamen/screens/report_place.dart';
 import 'package:bhaithamen/screens/settings_wrapper.dart';
 import 'package:bhaithamen/screens/welfare_check.dart';
@@ -348,8 +349,17 @@ class _MapPlacesState extends State<MapPlaces> {
     }
   }
 
-  doShow(String name, String detailsEN, String detailsBN, String price,
-      String phone, LatLng location, images, docId) async {
+  doShow(
+      SafePlace theSafePlace,
+      String nameEN,
+      String nameBN,
+      String detailsEN,
+      String detailsBN,
+      String price,
+      String phone,
+      LatLng location,
+      images,
+      docId) async {
     DocumentSnapshot placeDoc = await safePlaceCollection
         .doc('dhaka')
         .collection(autoSetCategory.shouldGoCategory)
@@ -357,11 +367,14 @@ class _MapPlacesState extends State<MapPlaces> {
         .get();
 
     String details;
+    String name;
 
     if (languageIndex == 0) {
       details = detailsEN;
+      name = nameEN;
     } else {
       details = detailsBN;
+      name = nameBN;
     }
 
     raters = placeDoc['raters'];
@@ -493,6 +506,52 @@ class _MapPlacesState extends State<MapPlaces> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
+                                    builder: (context) => PlaceFullDetails(user,
+                                        observer, analytics, theSafePlace)),
+                              );
+                            },
+                            child: Container(
+                              height: 40,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Icon(FontAwesomeIcons.list)),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                            languages[selectedLanguage[
+                                                languageIndex]]['fullDetails'],
+                                            style: myStyle(18)),
+                                      )
+                                    ],
+                                  ),
+                                  Icon(Icons.arrow_right),
+                                ],
+                              ),
+                            )),
+                      ),
+                    ),
+                    SizedBox(height: 15),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                              bottom: BorderSide(color: Colors.grey[400])),
+                        ),
+                        child: InkWell(
+                            splashColor: Colors.blueAccent,
+                            onTap: () {
+                              // Navigator.of(context).pop();
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
                                     builder: (context) => ReportPlace(
                                         name,
                                         location,
@@ -565,12 +624,26 @@ class _MapPlacesState extends State<MapPlaces> {
 
           double rate = safePlaces[i].rating / safePlaces[i].raters;
 
+          if (safePlaces[i].rating == 0 && safePlaces[i].raters == 0) {
+            rate = 0;
+          }
+
+          String name;
+
+          if (languageIndex == 0) {
+            name = safePlaces[i].nameEN;
+          } else {
+            name = safePlaces[i].nameBN;
+          }
+
           _markers.add(Marker(
               markerId: MarkerId(safePlaces[i].docId),
               position: latLng,
               onTap: () {
                 doShow(
-                    safePlaces[i].name,
+                    safePlaces[i],
+                    safePlaces[i].nameEN,
+                    safePlaces[i].nameBN,
                     safePlaces[i].detailsEN,
                     safePlaces[i].detailsBN,
                     safePlaces[i].price,
@@ -581,7 +654,7 @@ class _MapPlacesState extends State<MapPlaces> {
               },
               icon: myMarkers[safePlaces[i].category],
               infoWindow: InfoWindow(
-                  title: safePlaces[i].name,
+                  title: name,
                   snippet: rate.toStringAsFixed(1) + ' out of 5')));
 
           //print('MARKER' + safePlaces[i].name);

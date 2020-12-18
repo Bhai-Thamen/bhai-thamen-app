@@ -207,7 +207,8 @@ Map<String, String> english = {
   'reportReason3': 'Other',
   'reportButton': 'Send Report',
   'reportPlaceSubmitted': 'Thank you. We have received your report.',
-  'reportPlaceBtn': 'Report BD',
+  'reportPlaceBtn': 'Report',
+  'fullDetails': 'Full Details',
   'lowcost': 'Low Cost',
   'reasonable': 'Reasonable',
   'slightlyexpensive': 'Slightly Expensive',
@@ -217,6 +218,7 @@ Map<String, String> english = {
   'free': 'Free',
   'getDirections': 'Get Directions',
   'price': 'Price: ',
+  'facilities': 'Facilities',
 };
 
 Map<String, String> bangla = {
@@ -438,6 +440,7 @@ Map<String, String> bangla = {
   'reportPlaceSubmitted': 'Thank you. We have received your report. BD',
   'reportPlaceBtn': 'Report BD',
   'lowcost': 'Low Cost BD',
+  'fullDetails': 'Full Details BD',
   'reasonable': 'Reasonable BD',
   'slightlyexpensive': 'Slightly Expensive BD',
   'expensive': 'Expensive BD',
@@ -446,6 +449,7 @@ Map<String, String> bangla = {
   'free': 'Free BD',
   'getDirections': 'Get Directions BD',
   'price': 'Price BD: ',
+  'facilities': 'Facilities BD',
 };
 
 Map<String, Map<String, String>> languages = {

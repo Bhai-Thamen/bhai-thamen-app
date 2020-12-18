@@ -6,7 +6,16 @@ class SafePlace {
   final String docId;
   final String price;
   final String phone;
-  final String name;
+  final String website;
+  final String social;
+  final String locationDescEN;
+  final String locationDescBN;
+  final String typeEN;
+  final String typeBN;
+  final List<dynamic> facilitiesEN;
+  final List<dynamic> facilitiesBN;
+  final String nameEN;
+  final String nameBN;
   final String category;
   final List<dynamic> images;
   final GeoPoint location;
@@ -25,7 +34,16 @@ class SafePlace {
       this.raters,
       this.price,
       this.images,
-      this.name,
+      this.nameEN,
+      this.nameBN,
+      this.locationDescBN,
+      this.locationDescEN,
+      this.typeBN,
+      this.typeEN,
+      this.facilitiesBN,
+      this.facilitiesEN,
+      this.website,
+      this.social,
       this.docId});
 
   Map<String, dynamic> toMap() {
@@ -33,7 +51,16 @@ class SafePlace {
       'detailsEN': detailsEN,
       'detailsBN': detailsBN,
       'time': time,
-      'name': name,
+      'nameEN': nameEN,
+      'nameBN': nameBN,
+      'website': website,
+      'social': social,
+      'typeEN': typeEN,
+      'typeBN': typeBN,
+      'facilitiesBN': facilitiesBN,
+      'facilitiesEN': facilitiesEN,
+      'locationDescBN': locationDescBN,
+      'locationDescEN': locationDescEN,
       'phone': phone,
       'category': category,
       'images': images,
@@ -51,7 +78,16 @@ class SafePlace {
     return SafePlace(
         location: map['location'],
         time: map['time'],
-        name: map['name'],
+        nameEN: map['nameEN'],
+        nameBN: map['nameBN'],
+        website: map['website'],
+        social: map['social'],
+        typeBN: map['typeBN'],
+        typeEN: map['typeEN'],
+        facilitiesBN: map['facilitiesBN'],
+        facilitiesEN: map['facilitiesEN'],
+        locationDescBN: map['locationDescBN'],
+        locationDescEN: map['locationDescEN'],
         phone: map['phone'],
         category: map['category'],
         images: map['images'],
