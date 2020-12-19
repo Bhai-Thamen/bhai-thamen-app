@@ -47,7 +47,7 @@ class _PlaceFullDetailsState extends State<PlaceFullDetails> {
   String details;
   String locationDesc;
   String type;
-  List<String> facilities;
+  List<dynamic> facilities;
 
   final SafePlace safeData;
 
@@ -79,6 +79,12 @@ class _PlaceFullDetailsState extends State<PlaceFullDetails> {
     double lat = safeData.location.latitude;
     double lng = safeData.location.longitude;
     latLng = new LatLng(lat, lng);
+
+    print(locationDesc);
+    print(type);
+    print(facilities[0]);
+    print(details);
+    print(name);
   }
 
   setUpSlider() {
@@ -328,7 +334,7 @@ class _PlaceFullDetailsState extends State<PlaceFullDetails> {
                       SizedBox(height: 18),
                       for (var i = 0; i < facilities.length; i++)
                         Text(
-                          facilities[i],
+                          facilities[i].toString(),
                           style: myStyle(16),
                           maxLines: 1,
                           textAlign: TextAlign.center,

@@ -3,7 +3,7 @@ import 'package:bhaithamen/utilities/variables.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-var allIcons = ['toilets', 'medical', 'shopping', 'leisure', 'food', 'beauty'];
+var allIcons = ['toilets', 'pharmacy', 'shopping', 'leisure', 'food', 'beauty'];
 
 class MapTopMenu extends StatelessWidget {
   @override
