@@ -3,7 +3,16 @@ import 'package:bhaithamen/utilities/variables.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-var allIcons = ['toilets', 'pharmacy', 'shopping', 'leisure', 'food', 'beauty'];
+var allIcons = [
+  'toilet',
+  'pharmacy',
+  'shop',
+  'doctor',
+  'food',
+  'beauty',
+  'club',
+  'gym'
+];
 
 class MapTopMenu extends StatelessWidget {
   @override
@@ -55,7 +64,7 @@ class MapTopMenu extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                for (var i = 4; i < 6; i++)
+                for (var i = 4; i < 8; i++)
                   Column(
                     children: [
                       SizedBox(

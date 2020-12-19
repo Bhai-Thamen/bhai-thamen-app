@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bhaithamen/data/safe_place_data.dart';
 import 'package:bhaithamen/screens/home.dart';
 import 'package:bhaithamen/screens/map_wrapper.dart';
@@ -283,7 +284,13 @@ class _PlaceFullDetailsState extends State<PlaceFullDetails> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(height: 15),
-                Text(name, style: myStyle(20, Colors.black, FontWeight.bold)),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  child: AutoSizeText(name,
+                      maxLines: 1,
+                      style: myStyle(20, Colors.black, FontWeight.bold),
+                      textAlign: TextAlign.center),
+                ),
                 SizedBox(height: 15),
                 safeData.images.length == 0
                     ? Container()
@@ -307,15 +314,18 @@ class _PlaceFullDetailsState extends State<PlaceFullDetails> {
                       Row(
                         children: [
                           Flexible(
-                            child: Text(
-                              locationDesc,
-                              style: myStyle(16),
-                              maxLines: 3,
-                              textAlign: TextAlign.center,
+                            child: Center(
+                              child: Text(
+                                locationDesc,
+                                style: myStyle(16),
+                                maxLines: 3,
+                                textAlign: TextAlign.center,
+                              ),
                             ),
                           ),
                         ],
                       ),
+                      SizedBox(height: 16),
                       InkWell(
                           onTap: () {
                             openMap();

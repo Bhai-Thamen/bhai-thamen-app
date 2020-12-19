@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bhaithamen/data/safe_place_data.dart';
 import 'package:bhaithamen/data/user.dart';
 import 'package:bhaithamen/screens/custom_list_tile.dart';
@@ -78,12 +79,22 @@ class _MapPlacesState extends State<MapPlaces> {
 
   BitmapDescriptor toiletMarker;
   BitmapDescriptor pharmacyMarker;
-  BitmapDescriptor hospitalMarker;
+  BitmapDescriptor doctorMarker;
+  BitmapDescriptor clubMarker;
+  BitmapDescriptor gymMarker;
+  BitmapDescriptor shopMarker;
+  BitmapDescriptor beautyMarker;
+  BitmapDescriptor foodMarker;
 
   Map<String, BitmapDescriptor> myMarkers = {
-    'toilets': null,
+    'toilet': null,
     'pharmacy': null,
-    'hospital': null
+    'doctor': null,
+    'club': null,
+    'gym': null,
+    'shop': null,
+    'beauty': null,
+    'food': null
   };
 
   var _topModalData = "";
@@ -92,7 +103,13 @@ class _MapPlacesState extends State<MapPlaces> {
     super.initState();
     setToiletCustomMarker();
     setPharmacyCustomMarker();
-    setHospitalCustomMarker();
+    setDoctorCustomMarker();
+    setClubCustomMarker();
+    setGymCustomMarker();
+    setShopCustomMarker();
+    setBeautyCustomMarker();
+    setFoodCustomMarker();
+
     getCurrentUserInfo();
   }
 
@@ -173,20 +190,50 @@ class _MapPlacesState extends State<MapPlaces> {
 
   setToiletCustomMarker() async {
     toiletMarker = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(), 'assets/images/toilets.png');
-    myMarkers['toilets'] = toiletMarker;
+        ImageConfiguration(), 'assets/images/toilet.png');
+    myMarkers['toilet'] = toiletMarker;
   }
 
-  setHospitalCustomMarker() async {
-    hospitalMarker = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(), 'assets/images/hospital.png');
-    myMarkers['hospital'] = hospitalMarker;
+  setDoctorCustomMarker() async {
+    doctorMarker = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(), 'assets/images/doctor.png');
+    myMarkers['doctor'] = doctorMarker;
   }
 
   setPharmacyCustomMarker() async {
     pharmacyMarker = await BitmapDescriptor.fromAssetImage(
         ImageConfiguration(), 'assets/images/pharmacy.png');
     myMarkers['pharmacy'] = pharmacyMarker;
+  }
+
+  setClubCustomMarker() async {
+    clubMarker = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(), 'assets/images/club.png');
+    myMarkers['club'] = clubMarker;
+  }
+
+  setGymCustomMarker() async {
+    gymMarker = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(), 'assets/images/gym.png');
+    myMarkers['gym'] = gymMarker;
+  }
+
+  setFoodCustomMarker() async {
+    foodMarker = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(), 'assets/images/food.png');
+    myMarkers['food'] = foodMarker;
+  }
+
+  setBeautyCustomMarker() async {
+    beautyMarker = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(), 'assets/images/beauty.png');
+    myMarkers['beauty'] = beautyMarker;
+  }
+
+  setShopCustomMarker() async {
+    shopMarker = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(), 'assets/images/shop.png');
+    myMarkers['shop'] = shopMarker;
   }
 
   Future<void> openMap(LatLng location) async {
@@ -400,8 +447,13 @@ class _MapPlacesState extends State<MapPlaces> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(name,
-                            style: myStyle(22, Colors.black, FontWeight.bold)),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          child: AutoSizeText(name,
+                              maxLines: 1,
+                              style:
+                                  myStyle(22, Colors.black, FontWeight.bold)),
+                        ),
                         SizedBox(width: 12),
                         GestureDetector(
                             onTap: () {
