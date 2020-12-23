@@ -191,19 +191,19 @@ class _MapPlacesState extends State<MapPlaces> {
 
   setToiletCustomMarker() async {
     toiletMarker = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(), 'assets/images/toilet.png');
+        ImageConfiguration(), 'assets/pins/toilet.png');
     myMarkers['toilet'] = toiletMarker;
   }
 
   setDoctorCustomMarker() async {
     doctorMarker = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(), 'assets/images/doctor.png');
+        ImageConfiguration(), 'assets/pins/doctor.png');
     myMarkers['doctor'] = doctorMarker;
   }
 
   setPharmacyCustomMarker() async {
     pharmacyMarker = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(), 'assets/images/pharmacy.png');
+        ImageConfiguration(), 'assets/pins/pharmacy.png');
     myMarkers['pharmacy'] = pharmacyMarker;
   }
 
@@ -215,25 +215,25 @@ class _MapPlacesState extends State<MapPlaces> {
 
   setGymCustomMarker() async {
     gymMarker = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(), 'assets/images/gym.png');
+        ImageConfiguration(), 'assets/pins/gym.png');
     myMarkers['gym'] = gymMarker;
   }
 
   setFoodCustomMarker() async {
     foodMarker = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(), 'assets/images/food.png');
+        ImageConfiguration(), 'assets/pins/food.png');
     myMarkers['food'] = foodMarker;
   }
 
   setBeautyCustomMarker() async {
     beautyMarker = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(), 'assets/images/beauty.png');
+        ImageConfiguration(), 'assets/pins/beauty.png');
     myMarkers['beauty'] = beautyMarker;
   }
 
   setShopCustomMarker() async {
     shopMarker = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(), 'assets/images/shop.png');
+        ImageConfiguration(), 'assets/pins/shop.png');
     myMarkers['shop'] = shopMarker;
   }
 
