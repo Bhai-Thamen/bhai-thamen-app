@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bhaithamen/data/user.dart';
 import 'package:bhaithamen/data/userData.dart';
+import 'package:bhaithamen/screens/about.dart';
 import 'package:bhaithamen/screens/countdown_screen.dart';
 import 'package:bhaithamen/screens/custom_list_tile.dart';
 import 'package:bhaithamen/screens/map_places.dart';
@@ -376,19 +377,28 @@ class _HomeState extends State<Home> {
               languages[selectedLanguage[languageIndex]]['sideMenu1'],
               FontAwesomeIcons.newspaper,
               NewsWrapper(widget.user, observer, analytics),
+              false,
               false),
           CustomListTile(
               languages[selectedLanguage[languageIndex]]['sideMenu2'],
               FontAwesomeIcons.hardHat,
               Home(widget.user, observer, analytics),
-              true),
+              true,
+              false),
           CustomListTile(
               languages[selectedLanguage[languageIndex]]['sideMenu3'],
               FontAwesomeIcons.map,
               MapPlacesWrapper(widget.user, observer, analytics),
+              false,
               false),
           CustomListTile(languages[selectedLanguage[languageIndex]]['settings'],
-              FontAwesomeIcons.cog, SettingsWrapper(), false),
+              FontAwesomeIcons.cog, SettingsWrapper(), false, true),
+          CustomListTile(
+              languages[selectedLanguage[languageIndex]]['about'],
+              FontAwesomeIcons.questionCircle,
+              AboutPage(widget.user, observer, analytics),
+              false,
+              false),
         ])),
 
         body: pageOptions[homePageIndex],

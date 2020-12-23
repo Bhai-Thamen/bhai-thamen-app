@@ -221,6 +221,11 @@ Map<String, String> english = {
   'getDirections': 'Get Directions',
   'price': 'Price: ',
   'facilities': 'Facilities',
+  'about': 'about',
+  'aboutTitle': 'About Bhai Thamen',
+  'aboutDetails':
+      'The app offers various support functions for women in insecure situations. Bangladesh has faced a series of rape and sexual harassment cases in recent years. BhaiThamen supports women commuting and traveling alone in Bangladesh and being at risk of being sexually harassed.',
+  'aboutPartners': 'Partners'
 };
 
 Map<String, String> bangla = {
@@ -453,6 +458,11 @@ Map<String, String> bangla = {
   'getDirections': 'Get Directions BD',
   'price': 'Price BD: ',
   'facilities': 'Facilities BD',
+  'about': 'about BD',
+  'aboutTitle': 'BD About Bhai Thamen',
+  'aboutDetails':
+      'BD The app offers various support functions for women in insecure situations. Bangladesh has faced a series of rape and sexual harassment cases in recent years. BhaiThamen supports women commuting and traveling alone in Bangladesh and being at risk of being sexually harassed.',
+  'aboutPartners': 'BD Partners'
 };
 
 Map<String, Map<String, String>> languages = {

@@ -1,4 +1,5 @@
 import 'package:bhaithamen/data/user.dart';
+import 'package:bhaithamen/screens/about.dart';
 import 'package:bhaithamen/screens/custom_list_tile.dart';
 import 'package:bhaithamen/screens/home.dart';
 import 'package:bhaithamen/screens/map_places_wrapper.dart';
@@ -130,19 +131,28 @@ class _MapPlacesOLDState extends State<MapPlacesOLD> {
               languages[selectedLanguage[languageIndex]]['sideMenu1'],
               FontAwesomeIcons.newspaper,
               NewsWrapper(user, observer, analytics),
+              false,
               false),
           CustomListTile(
               languages[selectedLanguage[languageIndex]]['sideMenu2'],
               FontAwesomeIcons.hardHat,
               Home(user, observer, analytics),
+              false,
               false),
           CustomListTile(
               languages[selectedLanguage[languageIndex]]['sideMenu3'],
               FontAwesomeIcons.map,
               MapPlacesWrapper(user, observer, analytics),
-              true),
+              true,
+              false),
           CustomListTile(languages[selectedLanguage[languageIndex]]['settings'],
-              FontAwesomeIcons.cog, SettingsWrapper(), false),
+              FontAwesomeIcons.cog, SettingsWrapper(), false, true),
+          CustomListTile(
+              languages[selectedLanguage[languageIndex]]['about'],
+              FontAwesomeIcons.questionCircle,
+              AboutPage(widget.user, observer, analytics),
+              false,
+              false),
         ])),
         backLayer: Center(
           child: GestureDetector(

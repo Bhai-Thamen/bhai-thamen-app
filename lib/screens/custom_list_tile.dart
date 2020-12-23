@@ -8,8 +8,10 @@ class CustomListTile extends StatelessWidget {
   final IconData theIcon;
   final StatefulWidget navigateTo;
   final bool ignoreLink;
+  final bool isSettingsPage;
 
-  CustomListTile(this.title, this.theIcon, this.navigateTo, this.ignoreLink);
+  CustomListTile(this.title, this.theIcon, this.navigateTo, this.ignoreLink,
+      this.isSettingsPage);
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +25,10 @@ class CustomListTile extends StatelessWidget {
             splashColor: Colors.blueAccent,
             onTap: () {
               Navigator.of(context).pop();
+              if (!isSettingsPage) {
+                if (!ignoreLink) Navigator.of(context).pop();
+              }
+
               if (!ignoreLink) {
                 Navigator.push(
                   context,

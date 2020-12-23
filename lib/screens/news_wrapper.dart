@@ -6,6 +6,7 @@ import 'package:bhaithamen/data/news_feed.dart';
 import 'package:bhaithamen/data/user.dart';
 import 'package:bhaithamen/data/userData.dart';
 import 'package:bhaithamen/data/user_news_feed.dart';
+import 'package:bhaithamen/screens/about.dart';
 import 'package:bhaithamen/screens/alerts_news.dart';
 import 'package:bhaithamen/screens/custom_list_tile.dart';
 import 'package:bhaithamen/screens/home.dart';
@@ -322,115 +323,251 @@ class _NewsWrapperState extends State<NewsWrapper> {
           return StatefulBuilder(builder: (BuildContext context,
               StateSetter setModalState /*You can rename this!*/) {
             return !isUploading
-                ? Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12.0, vertical: 12.0),
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                              navigateSettings();
+                            },
+                            child: Container(
+                                color: Colors.blue,
+                                width: MediaQuery.of(context).size.width * 0.2,
+                                padding: EdgeInsets.all(15.0),
+                                child: Icon(Icons.camera_alt,
+                                    color: Colors.white)),
+                          ),
+                          Container(
+                            padding: EdgeInsets.all(3.0),
+                            color: Colors.grey[300],
+                            width: MediaQuery.of(context).size.width * 0.6,
                             child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text('Share something...',
-                                      style: myStyle(21)),
-                                  Spacer(),
-                                  FlatButton(
-                                    color: Colors.blue,
-                                    child: Text('img'),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      navigateSettings();
-                                    },
-                                  ),
-                                ])),
-                        SizedBox(
-                          height: 4.0,
-                        ),
-                        multiPickedImages.length > 0
-                            ? SizedBox(
-                                height: 150,
-                                child: Column(
-                                  children: [
-                                    Expanded(
-                                        child: GridView.count(
-                                      crossAxisCount: 3,
-                                      children: List.generate(
-                                          multiPickedImages.length, (index) {
-                                        Asset asset = multiPickedImages[index];
-                                        return GestureDetector(
-                                          onLongPress: () {
-                                            setModalState(() {
-                                              multiPickedImages.removeAt(index);
-                                            });
-                                          },
-                                          child: AssetThumb(
-                                            asset: asset,
-                                            width: 100,
-                                            height: 100,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                shareLocation
+                                    ? Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 4.0),
+                                        child: Icon(
+                                          Icons.place,
+                                          color: Colors.green,
+                                        ),
+                                      )
+                                    : Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Icon(
+                                          Icons.wrong_location,
+                                          color: Colors.red[700],
+                                        ),
+                                      ),
+                                shareLocation
+                                    ? Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 8.0),
+                                        child: Container(
+                                          width: 110,
+                                          child: Text(
+                                            languages[selectedLanguage[
+                                                    languageIndex]]
+                                                ['locationSharingStatusOn'],
+                                            style: myStyle(14),
+                                            textAlign: TextAlign.left,
+                                            maxLines: 2,
                                           ),
-                                        );
-                                      }),
-                                    )),
-                                  ],
+                                        ),
+                                      )
+                                    : Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 8.0),
+                                        child: Container(
+                                          width: 110,
+                                          child: Text(
+                                            languages[selectedLanguage[
+                                                    languageIndex]]
+                                                ['locationSharingStatusOff'],
+                                            style: myStyle(14),
+                                            textAlign: TextAlign.left,
+                                            maxLines: 2,
+                                          ),
+                                        ),
+                                      ),
+                                Switch(
+                                    activeColor: Colors.green[500],
+                                    inactiveThumbColor: Colors.red[700],
+                                    value: shareLocation,
+                                    onChanged: (bool val) {
+                                      setModalState(() {
+                                        shareLocation = !shareLocation;
+                                      });
+                                    }),
+                              ],
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setModalState(() {
+                                isUploading = true;
+                              });
+                              _postComment();
+                            },
+                            child: Container(
+                                padding: EdgeInsets.all(15.0),
+                                color: Colors.blue,
+                                width: MediaQuery.of(context).size.width * 0.2,
+                                child: Icon(Icons.send, color: Colors.white)),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            SizedBox(
+                              height: 4.0,
+                            ),
+                            multiPickedImages.length > 0
+                                ? SizedBox(
+                                    height: 150,
+                                    child: Column(
+                                      children: [
+                                        Expanded(
+                                            child: GridView.count(
+                                          scrollDirection: Axis.horizontal,
+                                          crossAxisCount: 1,
+                                          children: List.generate(
+                                              multiPickedImages.length,
+                                              (index) {
+                                            Asset asset =
+                                                multiPickedImages[index];
+
+                                            return Stack(
+                                                alignment: Alignment.topLeft,
+                                                children: <Widget>[
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            2.0),
+                                                    child: Card(
+                                                      elevation: 6,
+                                                      child: AssetThumb(
+                                                        asset: asset,
+                                                        width: 150,
+                                                        height: 150,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                      padding:
+                                                          EdgeInsets.all(10.0),
+                                                      child: GestureDetector(
+                                                        onTap: () {
+                                                          setModalState(() {
+                                                            multiPickedImages
+                                                                .removeAt(
+                                                                    index);
+                                                          });
+                                                        },
+                                                        child: Container(
+                                                          decoration:
+                                                              new BoxDecoration(
+                                                            shape:
+                                                                BoxShape.circle,
+                                                            border:
+                                                                new Border.all(
+                                                              color: Colors
+                                                                  .black26,
+                                                              width: 2.0,
+                                                            ),
+                                                          ),
+                                                          child: CircleAvatar(
+                                                              radius: 15,
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .white70,
+                                                              child: Icon(
+                                                                Icons.delete,
+                                                                color: Colors
+                                                                    .red[800],
+                                                                size: 25,
+                                                              )),
+                                                        ),
+                                                      )),
+                                                ]);
+                                          }),
+                                        )),
+                                      ],
+                                    ),
+                                  )
+                                : Container(),
+                            SizedBox(height: 8),
+
+                            Divider(
+                              height: 2.0,
+                              thickness: 2.0,
+                              color: Colors.grey[300],
+                            ),
+
+                            Padding(
+                              padding: EdgeInsets.only(
+                                bottom:
+                                    MediaQuery.of(context).viewInsets.bottom,
+                                left: 5.0,
+                                right: 5.0,
+                                top: 8.0,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                    12.0, 2.0, 12.0, 2.0),
+                                child: Container(
+                                  color: Colors.grey[200],
+                                  child: ConstrainedBox(
+                                    constraints: new BoxConstraints(
+                                      minWidth:
+                                          MediaQuery.of(context).size.width,
+                                      maxWidth:
+                                          MediaQuery.of(context).size.height,
+                                      minHeight: 85.0,
+                                      maxHeight: 105.0,
+                                    ),
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.vertical,
+                                      reverse: true,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: TextField(
+                                          keyboardType: TextInputType.multiline,
+                                          maxLines: null,
+                                          autofocus: true,
+                                          controller: myNews,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              )
-                            : Container(),
-                        SizedBox(height: 20),
-                        Row(
-                          children: [
-                            shareLocation
-                                ? Text(
-                                    languages[selectedLanguage[languageIndex]]
-                                        ['locationSharingStatusOn'],
-                                    style: myStyle(18))
-                                : Text(
-                                    languages[selectedLanguage[languageIndex]]
-                                        ['locationSharingStatusOff'],
-                                    style: myStyle(18)),
-                            Switch(
-                                activeColor: Colors.red[500],
-                                inactiveThumbColor: Colors.black54,
-                                value: shareLocation,
-                                onChanged: (bool val) {
-                                  setModalState(() {
-                                    shareLocation = !shareLocation;
-                                  });
-                                }),
+                              ),
+                            ),
+                            // FlatButton(
+                            //   color: Colors.blue,
+                            //   child: Text('post'),
+                            //   onPressed: () {
+                            //     setModalState(() {
+                            //       isUploading = true;
+                            //     });
+                            //     _postComment();
+                            //   },
+                            // ),
+
+                            SizedBox(height: 15),
                           ],
                         ),
-                        Padding(
-                            padding: EdgeInsets.only(
-                              bottom: MediaQuery.of(context).viewInsets.bottom,
-                              left: 5.0,
-                              right: 5.0,
-                            ),
-                            child: Row(children: [
-                              SizedBox(
-                                width: 220,
-                                child: TextField(
-                                  minLines: 1,
-                                  maxLines: 8,
-                                  autofocus: false,
-                                  controller: myNews,
-                                ),
-                              ),
-                              FlatButton(
-                                color: Colors.blue,
-                                child: Text('post'),
-                                onPressed: () {
-                                  setModalState(() {
-                                    isUploading = true;
-                                  });
-                                  _postComment();
-                                },
-                              ),
-                            ])),
-                        SizedBox(height: 50),
-                      ],
-                    ),
+                      ),
+                    ],
                   )
                 : SizedBox(
                     child: Center(
@@ -618,19 +755,28 @@ class _NewsWrapperState extends State<NewsWrapper> {
               languages[selectedLanguage[languageIndex]]['sideMenu1'],
               FontAwesomeIcons.newspaper,
               NewsWrapper(user, observer, analytics),
-              true),
+              true,
+              false),
           CustomListTile(
               languages[selectedLanguage[languageIndex]]['sideMenu2'],
               FontAwesomeIcons.hardHat,
               Home(user, observer, analytics),
+              false,
               false),
           CustomListTile(
               languages[selectedLanguage[languageIndex]]['sideMenu3'],
               FontAwesomeIcons.map,
               MapPlacesWrapper(user, observer, analytics),
+              false,
               false),
           CustomListTile(languages[selectedLanguage[languageIndex]]['settings'],
-              FontAwesomeIcons.cog, SettingsWrapper(), false),
+              FontAwesomeIcons.cog, SettingsWrapper(), false, true),
+          CustomListTile(
+              languages[selectedLanguage[languageIndex]]['about'],
+              FontAwesomeIcons.questionCircle,
+              AboutPage(widget.user, observer, analytics),
+              false,
+              false),
         ])),
         body: Column(
           children: [

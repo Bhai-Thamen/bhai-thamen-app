@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
-    <application tools:replace="android:label" android:name="io.flutter.app.FlutterApplication" android:label="ভাই থামেন" android:icon="@mipmap/ic_launcher">
+    <application tools:replace="android:label" android:name="io.flutter.app.FlutterApplication" android:label="ভাই থামেন" android:icon="@drawable/ic_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyA93MkaragygMfhAUK1ataXR9jm5xBcyj0"/>
         <!-- flutter_background_geolocation licence -->
 +        <meta-data android:name="com.transistorsoft.locationmanager.license" android:value="28552731bb6172470ff30d3b3dad059d7c7afed0b445d632050061cb2ed1c315" />
